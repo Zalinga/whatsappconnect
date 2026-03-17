@@ -3,35 +3,39 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>WhatsApp Portal — Zalinga Technologies</title>
+  <title>WAConnect Portal — Zalinga Technologies</title>
   <link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;600;700;800&family=DM+Sans:ital,wght@0,300;0,400;0,500;1,300&display=swap" rel="stylesheet" />
   <style>
-    /* ─── TOKENS ─────────────────────────────────────────── */
     :root {
-      --bg:        #0b0f1a;
-      --surface:   #111827;
-      --surface2:  #1a2236;
-      --border:    rgba(255,255,255,0.08);
-      --border-hi: rgba(37,211,102,0.35);
-      --text:      #f0f4ff;
-      --muted:     #6b7a99;
-      --green:     #25D366;
-      --green-glow:rgba(37,211,102,0.25);
-      --green-dark:#178a42;
-      --accent:    #4f8bff;
-      --danger:    #ff4d6d;
-      --warn:      #ffaa00;
-      --radius:    16px;
-      --radius-sm: 10px;
-      --shadow:    0 8px 40px rgba(0,0,0,0.5);
-      --font-head: 'Syne', sans-serif;
-      --font-body: 'DM Sans', sans-serif;
-      --transition: 0.22s cubic-bezier(0.4,0,0.2,1);
+      --bg:          #0b0f1a;
+      --surface:     #111827;
+      --surface2:    #1a2236;
+      --surface3:    #1f2d45;
+      --border:      rgba(255,255,255,0.08);
+      --border-hi:   rgba(37,211,102,0.35);
+      --text:        #f0f4ff;
+      --muted:       #6b7a99;
+      --green:       #25D366;
+      --green-glow:  rgba(37,211,102,0.25);
+      --green-dark:  #178a42;
+      --accent:      #4f8bff;
+      --gold:        #f5c842;
+      --gold-glow:   rgba(245,200,66,0.2);
+      --purple:      #a78bfa;
+      --danger:      #ff4d6d;
+      --warn:        #ffaa00;
+      --radius:      16px;
+      --radius-sm:   10px;
+      --shadow:      0 8px 40px rgba(0,0,0,0.5);
+      --font-head:   'Syne', sans-serif;
+      --font-body:   'DM Sans', sans-serif;
+      --transition:  0.22s cubic-bezier(0.4,0,0.2,1);
     }
     [data-theme="light"] {
       --bg:       #f0f4ff;
       --surface:  #ffffff;
       --surface2: #eef2fb;
+      --surface3: #e4eaf8;
       --border:   rgba(0,0,0,0.08);
       --border-hi:rgba(37,211,102,0.4);
       --text:     #111827;
@@ -39,7 +43,6 @@
       --shadow:   0 8px 40px rgba(0,0,0,0.1);
     }
 
-    /* ─── RESET ──────────────────────────────────────────── */
     *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
     html { scroll-behavior: smooth; }
     body {
@@ -51,131 +54,91 @@
       min-height: 100vh;
       transition: background var(--transition), color var(--transition);
     }
-
-    /* ─── SCROLLBAR ──────────────────────────────────────── */
     ::-webkit-scrollbar { width: 6px; }
     ::-webkit-scrollbar-track { background: var(--bg); }
     ::-webkit-scrollbar-thumb { background: var(--surface2); border-radius: 4px; }
 
-    /* ─── TOAST ──────────────────────────────────────────── */
-    #toastContainer {
-      position: fixed; top: 24px; right: 24px;
-      z-index: 9999; display: flex; flex-direction: column; gap: 10px;
-    }
+    /* ─── TOAST ── */
+    #toastContainer { position: fixed; top: 24px; right: 24px; z-index: 9999; display: flex; flex-direction: column; gap: 10px; }
     .toast {
-      background: var(--surface);
-      border: 1px solid var(--border);
-      color: var(--text);
-      padding: 14px 20px;
-      border-radius: var(--radius-sm);
-      font-family: var(--font-body);
-      font-size: 14px;
-      display: flex; align-items: center; gap: 10px;
-      box-shadow: var(--shadow);
-      animation: slideIn 0.3s ease forwards;
-      max-width: 320px;
+      background: var(--surface); border: 1px solid var(--border); color: var(--text);
+      padding: 14px 20px; border-radius: var(--radius-sm); font-size: 14px;
+      display: flex; align-items: center; gap: 10px; box-shadow: var(--shadow);
+      animation: slideIn 0.3s ease forwards; max-width: 320px;
     }
     .toast.success { border-left: 3px solid var(--green); }
     .toast.error   { border-left: 3px solid var(--danger); }
     .toast.info    { border-left: 3px solid var(--accent); }
-    @keyframes slideIn {
-      from { transform: translateX(120%); opacity: 0; }
-      to   { transform: translateX(0);   opacity: 1; }
-    }
-    @keyframes slideOut {
-      from { transform: translateX(0);   opacity: 1; }
-      to   { transform: translateX(120%); opacity: 0; }
-    }
+    .toast.gold    { border-left: 3px solid var(--gold); }
+    @keyframes slideIn { from { transform: translateX(120%); opacity: 0; } to { transform: translateX(0); opacity: 1; } }
+    @keyframes slideOut { from { transform: translateX(0); opacity: 1; } to { transform: translateX(120%); opacity: 0; } }
 
-    /* ─── TOP BAR ────────────────────────────────────────── */
+    /* ─── TOPBAR ── */
     .topbar {
       position: sticky; top: 0; z-index: 100;
-      background: rgba(11,15,26,0.8);
-      backdrop-filter: blur(20px);
-      -webkit-backdrop-filter: blur(20px);
-      border-bottom: 1px solid var(--border);
-      padding: 0 32px;
-      height: 64px;
+      background: rgba(11,15,26,0.88); backdrop-filter: blur(20px); -webkit-backdrop-filter: blur(20px);
+      border-bottom: 1px solid var(--border); padding: 0 32px; height: 64px;
       display: flex; align-items: center; justify-content: space-between;
       transition: background var(--transition);
     }
-    [data-theme="light"] .topbar { background: rgba(240,244,255,0.85); }
-    .topbar-brand {
-      display: flex; align-items: center; gap: 12px;
-    }
+    [data-theme="light"] .topbar { background: rgba(240,244,255,0.9); }
+    .topbar-brand { display: flex; align-items: center; gap: 12px; }
     .topbar-logo {
       width: 36px; height: 36px; border-radius: 10px;
       background: linear-gradient(135deg, var(--green), var(--green-dark));
-      display: flex; align-items: center; justify-content: center;
-      font-size: 18px;
+      display: flex; align-items: center; justify-content: center; font-size: 18px;
       box-shadow: 0 0 16px var(--green-glow);
     }
-    .topbar-title {
-      font-family: var(--font-head);
-      font-weight: 800;
-      font-size: 18px;
-      letter-spacing: -0.3px;
-    }
+    .topbar-title { font-family: var(--font-head); font-weight: 800; font-size: 18px; letter-spacing: -0.3px; }
     .topbar-title span { color: var(--green); }
-    .topbar-sub {
-      font-size: 11px;
-      color: var(--muted);
-      letter-spacing: 1.5px;
-      text-transform: uppercase;
+    .topbar-sub { font-size: 11px; color: var(--muted); letter-spacing: 1.5px; text-transform: uppercase; }
+    .topbar-actions { display: flex; align-items: center; gap: 10px; }
+    .tab-nav { display: flex; gap: 6px; background: var(--surface2); border: 1px solid var(--border); border-radius: 10px; padding: 4px; }
+    .tab-btn {
+      padding: 6px 14px; border-radius: 7px; font-size: 13px; font-weight: 500;
+      cursor: pointer; border: none; background: transparent; color: var(--muted);
+      transition: all var(--transition); white-space: nowrap;
     }
-    .topbar-actions { display: flex; align-items: center; gap: 12px; }
+    .tab-btn.active { background: var(--surface3); color: var(--text); box-shadow: 0 2px 8px rgba(0,0,0,0.2); }
+    .tab-btn.gold-tab.active { color: var(--gold); }
     .theme-toggle {
-      width: 40px; height: 40px; border-radius: 12px;
-      background: var(--surface2); border: 1px solid var(--border);
-      cursor: pointer; display: flex; align-items: center; justify-content: center;
-      font-size: 18px; transition: all var(--transition);
-      color: var(--text);
+      width: 36px; height: 36px; border-radius: 10px; background: var(--surface2); border: 1px solid var(--border);
+      cursor: pointer; display: flex; align-items: center; justify-content: center; font-size: 17px; color: var(--text);
+      transition: all var(--transition);
     }
-    .theme-toggle:hover { background: var(--surface); border-color: var(--border-hi); }
-    .shortcut-hint {
-      font-size: 11px; color: var(--muted);
-      background: var(--surface2); border: 1px solid var(--border);
-      border-radius: 6px; padding: 4px 8px; letter-spacing: 0.5px;
-    }
-    @media (max-width: 640px) { .shortcut-hint { display: none; } }
+    .theme-toggle:hover { border-color: var(--border-hi); }
+    @media (max-width: 640px) { .tab-nav { display: none; } }
 
-    /* ─── LAYOUT ─────────────────────────────────────────── */
+    /* ─── VIEWS ── */
+    .view { display: none; }
+    .view.active { display: block; }
+
+    /* ─── PAGE LAYOUT ── */
     .page {
-      max-width: 1100px; margin: 0 auto;
-      padding: 40px 24px 80px;
-      display: grid;
-      grid-template-columns: 420px 1fr;
-      gap: 28px;
-      align-items: start;
+      max-width: 1140px; margin: 0 auto; padding: 40px 24px 80px;
+      display: grid; grid-template-columns: 420px 1fr; gap: 28px; align-items: start;
     }
-    @media (max-width: 900px) {
-      .page { grid-template-columns: 1fr; }
-    }
+    @media (max-width: 900px) { .page { grid-template-columns: 1fr; } }
     .left-col { position: sticky; top: 88px; }
 
-    /* ─── CARD ───────────────────────────────────────────── */
+    /* ─── CARD ── */
     .card {
-      background: var(--surface);
-      border: 1px solid var(--border);
-      border-radius: var(--radius);
-      padding: 28px;
-      box-shadow: var(--shadow);
+      background: var(--surface); border: 1px solid var(--border);
+      border-radius: var(--radius); padding: 28px; box-shadow: var(--shadow);
       transition: background var(--transition), border var(--transition);
+      animation: fadeIn 0.5s ease both;
     }
-    .card + .card { margin-top: 0; }
+    @keyframes fadeIn { from { opacity: 0; transform: translateY(12px); } to { opacity: 1; transform: none; } }
+    .right-col .card:nth-child(1) { animation-delay: 0.05s; }
+    .right-col .card:nth-child(2) { animation-delay: 0.1s; }
+    .right-col .card:nth-child(3) { animation-delay: 0.15s; }
 
-    /* ─── HERO HEADER ────────────────────────────────────── */
-    .hero-header {
-      text-align: center;
-      padding-bottom: 28px;
-      border-bottom: 1px solid var(--border);
-      margin-bottom: 28px;
-    }
+    /* ─── HERO HEADER ── */
+    .hero-header { text-align: center; padding-bottom: 28px; border-bottom: 1px solid var(--border); margin-bottom: 28px; }
     .hero-icon {
       width: 72px; height: 72px; border-radius: 22px; margin: 0 auto 16px;
       background: linear-gradient(135deg, var(--green), var(--green-dark));
-      display: flex; align-items: center; justify-content: center;
-      font-size: 36px;
+      display: flex; align-items: center; justify-content: center; font-size: 36px;
       box-shadow: 0 0 36px var(--green-glow), 0 0 72px rgba(37,211,102,0.1);
       animation: pulse 3s ease-in-out infinite;
     }
@@ -183,296 +146,366 @@
       0%,100% { box-shadow: 0 0 36px var(--green-glow), 0 0 72px rgba(37,211,102,0.1); }
       50%      { box-shadow: 0 0 48px rgba(37,211,102,0.5), 0 0 96px rgba(37,211,102,0.15); }
     }
-    .hero-title {
-      font-family: var(--font-head);
-      font-size: 26px; font-weight: 800; letter-spacing: -0.5px;
-      margin-bottom: 4px;
-    }
+    .hero-title { font-family: var(--font-head); font-size: 26px; font-weight: 800; letter-spacing: -0.5px; margin-bottom: 4px; }
     .hero-title span { color: var(--green); }
     .hero-sub { color: var(--muted); font-size: 13px; }
 
-    /* ─── FORM ───────────────────────────────────────────── */
+    /* ─── FORM ── */
     .field { margin-bottom: 18px; }
-    .field label {
-      display: block; margin-bottom: 8px;
-      font-size: 12px; font-weight: 500;
-      color: var(--muted); text-transform: uppercase; letter-spacing: 1px;
-    }
+    .field label { display: block; margin-bottom: 8px; font-size: 12px; font-weight: 500; color: var(--muted); text-transform: uppercase; letter-spacing: 1px; }
     .input-wrap { position: relative; }
-    .input-wrap .icon {
-      position: absolute; left: 14px; top: 50%; transform: translateY(-50%);
-      font-size: 16px; pointer-events: none;
-    }
+    .input-wrap .icon { position: absolute; left: 14px; top: 50%; transform: translateY(-50%); font-size: 16px; pointer-events: none; }
     .field input, .field select {
       width: 100%; padding: 13px 14px 13px 42px;
-      background: var(--surface2);
-      border: 1px solid var(--border);
-      border-radius: var(--radius-sm);
-      color: var(--text);
-      font-family: var(--font-body); font-size: 15px;
-      transition: all var(--transition);
-      appearance: none;
+      background: var(--surface2); border: 1px solid var(--border); border-radius: var(--radius-sm);
+      color: var(--text); font-family: var(--font-body); font-size: 15px; transition: all var(--transition); appearance: none;
     }
     .field select {
       background-image: url("data:image/svg+xml;charset=UTF-8,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%236b7a99' stroke-width='2'%3e%3cpolyline points='6 9 12 15 18 9'%3e%3c/polyline%3e%3c/svg%3e");
-      background-repeat: no-repeat; background-position: right 14px center; background-size: 14px;
-      padding-right: 36px;
+      background-repeat: no-repeat; background-position: right 14px center; background-size: 14px; padding-right: 36px;
     }
-    .field input:focus, .field select:focus {
-      outline: none;
-      border-color: var(--green);
-      background: var(--surface2);
-      box-shadow: 0 0 0 3px var(--green-glow);
-    }
+    .field input:focus, .field select:focus { outline: none; border-color: var(--green); box-shadow: 0 0 0 3px var(--green-glow); }
     .field input::placeholder { color: var(--muted); }
-    .phone-badge {
-      display: inline-flex; align-items: center; gap: 6px;
-      margin-top: 8px; padding: 5px 10px;
-      background: rgba(37,211,102,0.08);
-      border: 1px solid rgba(37,211,102,0.2);
-      border-radius: 6px; font-size: 12px; color: var(--green);
-    }
-    .field-error {
-      color: var(--danger); font-size: 12px; margin-top: 6px; display: none;
-    }
-
-    /* ─── REASON TAGS ────────────────────────────────────── */
-    .tag-row {
-      display: flex; flex-wrap: wrap; gap: 8px; margin-bottom: 4px;
-    }
-    .tag-chip {
-      padding: 7px 14px;
-      border-radius: 50px;
-      font-size: 13px; font-weight: 500;
-      cursor: pointer; border: 1px solid var(--border);
-      background: var(--surface2); color: var(--muted);
-      transition: all var(--transition); user-select: none;
-    }
+    .phone-badge { display: inline-flex; align-items: center; gap: 6px; margin-top: 8px; padding: 5px 10px; background: rgba(37,211,102,0.08); border: 1px solid rgba(37,211,102,0.2); border-radius: 6px; font-size: 12px; color: var(--green); }
+    .field-error { color: var(--danger); font-size: 12px; margin-top: 6px; display: none; }
+    .tag-row { display: flex; flex-wrap: wrap; gap: 8px; margin-bottom: 4px; }
+    .tag-chip { padding: 7px 14px; border-radius: 50px; font-size: 13px; font-weight: 500; cursor: pointer; border: 1px solid var(--border); background: var(--surface2); color: var(--muted); transition: all var(--transition); user-select: none; }
     .tag-chip:hover { border-color: var(--green); color: var(--text); }
-    .tag-chip.active {
-      background: var(--green); color: #fff; border-color: var(--green);
-      box-shadow: 0 0 12px var(--green-glow);
-    }
+    .tag-chip.active { background: var(--green); color: #fff; border-color: var(--green); box-shadow: 0 0 12px var(--green-glow); }
     .tag-chip.doc  { --chip-color: #4f8bff; }
     .tag-chip.hi   { --chip-color: var(--green); }
     .tag-chip.test { --chip-color: var(--warn); }
     .tag-chip.other{ --chip-color: #a78bfa; }
     .tag-chip.active { background: var(--chip-color, var(--green)); border-color: var(--chip-color, var(--green)); }
 
-    /* ─── CTA BUTTON ─────────────────────────────────────── */
     .cta-btn {
       width: 100%; padding: 16px;
       background: linear-gradient(135deg, var(--green), var(--green-dark));
-      color: #fff; border: none;
-      border-radius: var(--radius-sm);
-      font-family: var(--font-head); font-size: 17px; font-weight: 700;
-      cursor: pointer; letter-spacing: 0.3px;
+      color: #fff; border: none; border-radius: var(--radius-sm);
+      font-family: var(--font-head); font-size: 17px; font-weight: 700; cursor: pointer;
       display: flex; align-items: center; justify-content: center; gap: 10px;
-      box-shadow: 0 4px 24px var(--green-glow);
-      transition: all var(--transition); margin-top: 8px;
+      box-shadow: 0 4px 24px var(--green-glow); transition: all var(--transition); margin-top: 8px;
     }
-    .cta-btn:hover {
-      transform: translateY(-2px);
-      box-shadow: 0 8px 32px rgba(37,211,102,0.4);
-    }
+    .cta-btn:hover { transform: translateY(-2px); box-shadow: 0 8px 32px rgba(37,211,102,0.4); }
     .cta-btn:active { transform: scale(0.98); }
 
-    .link-preview {
-      margin-top: 16px; padding: 12px 16px;
-      background: rgba(37,211,102,0.06);
-      border: 1px solid rgba(37,211,102,0.2);
-      border-radius: var(--radius-sm);
-      font-size: 13px; word-break: break-all; display: none;
-    }
+    .link-preview { margin-top: 16px; padding: 12px 16px; background: rgba(37,211,102,0.06); border: 1px solid rgba(37,211,102,0.2); border-radius: var(--radius-sm); font-size: 13px; word-break: break-all; display: none; }
     .link-preview a { color: var(--green); text-decoration: none; }
-    .link-preview a:hover { text-decoration: underline; }
 
-    /* ─── PLAY BANNER ────────────────────────────────────── */
-    .play-banner {
-      margin-top: 24px; padding: 16px 20px;
-      background: var(--surface2);
-      border: 1px solid var(--border);
-      border-radius: var(--radius-sm);
-      display: flex; align-items: center; justify-content: space-between; gap: 12px;
+    /* ─── AD SLOT: SIDEBAR BANNER ── */
+    .ad-slot {
+      border-radius: var(--radius-sm); overflow: hidden; position: relative;
+      cursor: pointer; transition: all var(--transition);
     }
-    .play-banner-text h4 {
-      font-family: var(--font-head); font-size: 14px; font-weight: 700;
-      margin-bottom: 2px;
+    .ad-slot:hover { transform: translateY(-2px); box-shadow: 0 8px 32px rgba(0,0,0,0.3); }
+    .ad-slot-label {
+      position: absolute; top: 6px; right: 8px;
+      font-size: 9px; color: rgba(255,255,255,0.5);
+      background: rgba(0,0,0,0.4); border-radius: 4px; padding: 2px 6px;
+      letter-spacing: 1px; text-transform: uppercase;
     }
-    .play-banner-text p { font-size: 12px; color: var(--muted); }
-    .play-pill {
-      padding: 8px 16px; border-radius: 50px;
-      background: var(--text); color: var(--bg);
-      font-size: 13px; font-weight: 600; text-decoration: none;
-      white-space: nowrap; transition: opacity var(--transition);
+    /* Sidebar ad (left col, below form card) */
+    .ad-sidebar {
+      margin-top: 18px;
+      background: linear-gradient(135deg, #1a1230, #0d1a2e);
+      border: 1px solid rgba(167,139,250,0.25);
+      padding: 20px; text-align: center;
+      min-height: 120px; display: flex; flex-direction: column;
+      align-items: center; justify-content: center; gap: 8px;
     }
-    .play-pill:hover { opacity: 0.85; }
+    .ad-sidebar-demo-icon { font-size: 32px; }
+    .ad-sidebar-demo-title { font-family: var(--font-head); font-size: 15px; font-weight: 700; color: #d4b8ff; }
+    .ad-sidebar-demo-sub { font-size: 12px; color: rgba(167,139,250,0.6); }
+    .ad-sidebar-demo-cta {
+      margin-top: 6px; padding: 7px 18px; background: rgba(167,139,250,0.15);
+      border: 1px solid rgba(167,139,250,0.35); border-radius: 50px;
+      font-size: 12px; font-weight: 600; color: #a78bfa;
+    }
 
-    /* ─── RIGHT COL ──────────────────────────────────────── */
-    .right-col { display: flex; flex-direction: column; gap: 28px; }
+    /* ─── TOP LEADERBOARD AD ── */
+    .ad-leaderboard {
+      margin: 0 auto 24px; max-width: 1140px; padding: 0 24px;
+    }
+    .ad-leaderboard-inner {
+      background: linear-gradient(90deg, #0d1f12, #0f1f2e, #0d1f12);
+      border: 1px solid rgba(37,211,102,0.2);
+      border-radius: var(--radius-sm); padding: 14px 24px;
+      display: flex; align-items: center; justify-content: space-between; gap: 16px;
+      position: relative; overflow: hidden;
+    }
+    .ad-leaderboard-inner::before {
+      content: ''; position: absolute; inset: 0;
+      background: linear-gradient(90deg, transparent, rgba(37,211,102,0.03), transparent);
+      animation: shimmer 3s ease infinite;
+    }
+    @keyframes shimmer { 0%,100% { opacity: 0; } 50% { opacity: 1; } }
+    .ad-leader-left { display: flex; align-items: center; gap: 14px; }
+    .ad-leader-badge { font-size: 28px; }
+    .ad-leader-text h3 { font-family: var(--font-head); font-size: 15px; font-weight: 700; color: var(--green); }
+    .ad-leader-text p { font-size: 12px; color: var(--muted); }
+    .ad-leader-cta { padding: 9px 20px; border-radius: 50px; background: var(--green); color: #fff; font-size: 13px; font-weight: 700; white-space: nowrap; cursor: pointer; border: none; transition: all var(--transition); }
+    .ad-leader-cta:hover { background: var(--green-dark); transform: scale(1.04); }
+    .ad-slot-label-top { font-size: 9px; color: rgba(255,255,255,0.3); letter-spacing: 1px; text-transform: uppercase; white-space: nowrap; }
 
-    /* ─── STATS GRID ─────────────────────────────────────── */
-    .section-header {
-      display: flex; align-items: center; justify-content: space-between;
-      margin-bottom: 20px;
+    /* ─── IN-TABLE AD ── */
+    .ad-in-table td {
+      background: linear-gradient(90deg, rgba(245,200,66,0.04), rgba(245,200,66,0.02));
+      border-bottom: 1px solid rgba(245,200,66,0.12) !important;
     }
-    .section-title {
-      font-family: var(--font-head); font-size: 18px; font-weight: 700;
-    }
+    .ad-in-table-content { display: flex; align-items: center; gap: 12px; padding: 4px 0; }
+    .ad-in-table-icon { font-size: 24px; }
+    .ad-in-table-text { flex: 1; }
+    .ad-in-table-title { font-size: 13px; font-weight: 600; color: var(--gold); }
+    .ad-in-table-sub { font-size: 12px; color: var(--muted); }
+    .ad-in-table-btn { padding: 5px 14px; border-radius: 50px; background: rgba(245,200,66,0.12); border: 1px solid rgba(245,200,66,0.3); font-size: 12px; font-weight: 600; color: var(--gold); cursor: pointer; white-space: nowrap; transition: all var(--transition); }
+    .ad-in-table-btn:hover { background: rgba(245,200,66,0.22); }
+    .sponsored-tag { font-size: 9px; color: var(--gold); opacity: 0.5; letter-spacing: 1px; text-transform: uppercase; padding: 2px 6px; border: 1px solid rgba(245,200,66,0.2); border-radius: 4px; }
+
+    /* ─── STATS ── */
+    .section-header { display: flex; align-items: center; justify-content: space-between; margin-bottom: 20px; }
+    .section-title { font-family: var(--font-head); font-size: 18px; font-weight: 700; }
     .section-title span { color: var(--green); }
-    .btn-sm {
-      padding: 7px 16px; border-radius: 50px;
-      font-family: var(--font-body); font-size: 13px; font-weight: 500;
-      cursor: pointer; border: 1px solid var(--border);
-      background: var(--surface2); color: var(--text);
-      transition: all var(--transition);
-    }
+    .btn-sm { padding: 7px 16px; border-radius: 50px; font-family: var(--font-body); font-size: 13px; font-weight: 500; cursor: pointer; border: 1px solid var(--border); background: var(--surface2); color: var(--text); transition: all var(--transition); }
     .btn-sm:hover { border-color: var(--green); color: var(--green); }
     .btn-sm.danger:hover { border-color: var(--danger); color: var(--danger); }
 
-    .stats-grid {
-      display: grid; grid-template-columns: repeat(3, 1fr); gap: 16px;
-      margin-bottom: 24px;
-    }
+    .stats-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 16px; margin-bottom: 24px; }
     @media (max-width: 640px) { .stats-grid { grid-template-columns: 1fr 1fr; } }
     .stat-card {
       background: var(--surface2); border: 1px solid var(--border);
-      border-radius: var(--radius-sm); padding: 20px;
-      text-align: center; position: relative; overflow: hidden;
-      transition: border var(--transition);
+      border-radius: var(--radius-sm); padding: 20px; text-align: center;
+      position: relative; overflow: hidden; transition: border var(--transition);
     }
-    .stat-card::before {
-      content: ''; position: absolute; inset: 0;
-      background: linear-gradient(135deg, rgba(37,211,102,0.04), transparent);
-    }
+    .stat-card::before { content: ''; position: absolute; inset: 0; background: linear-gradient(135deg, rgba(37,211,102,0.04), transparent); }
     .stat-card:hover { border-color: var(--border-hi); }
-    .stat-label {
-      font-size: 11px; color: var(--muted); text-transform: uppercase;
-      letter-spacing: 1px; margin-bottom: 10px;
-    }
-    .stat-number {
-      font-family: var(--font-head); font-size: 38px; font-weight: 800;
-      color: var(--green); line-height: 1;
-      text-shadow: 0 0 20px var(--green-glow);
-      transition: all 0.5s cubic-bezier(0.4,0,0.2,1);
-    }
+    .stat-label { font-size: 11px; color: var(--muted); text-transform: uppercase; letter-spacing: 1px; margin-bottom: 10px; }
+    .stat-number { font-family: var(--font-head); font-size: 38px; font-weight: 800; color: var(--green); line-height: 1; text-shadow: 0 0 20px var(--green-glow); transition: all 0.5s cubic-bezier(0.4,0,0.2,1); }
     .stat-card:nth-child(2) .stat-number { color: var(--accent); text-shadow: 0 0 20px rgba(79,139,255,0.3); }
     .stat-card:nth-child(3) .stat-number { color: #a78bfa; text-shadow: 0 0 20px rgba(167,139,250,0.3); }
 
-    /* ─── MINI CHART ─────────────────────────────────────── */
     .chart-wrap { margin-top: 8px; }
-    .chart-title {
-      font-size: 13px; color: var(--muted); margin-bottom: 12px;
-      font-weight: 500;
-    }
-    .bar-chart {
-      display: flex; align-items: flex-end;
-      gap: 5px; height: 80px;
-    }
-    .bar-col {
-      flex: 1; display: flex; flex-direction: column;
-      align-items: center; gap: 4px; height: 100%; justify-content: flex-end;
-    }
-    .bar {
-      width: 100%; border-radius: 4px 4px 0 0;
-      background: linear-gradient(to top, var(--green-dark), var(--green));
-      transition: height 0.6s cubic-bezier(0.4,0,0.2,1);
-      min-height: 4px; position: relative; cursor: pointer;
-    }
+    .chart-title { font-size: 13px; color: var(--muted); margin-bottom: 12px; font-weight: 500; }
+    .bar-chart { display: flex; align-items: flex-end; gap: 5px; height: 80px; }
+    .bar-col { flex: 1; display: flex; flex-direction: column; align-items: center; gap: 4px; height: 100%; justify-content: flex-end; }
+    .bar { width: 100%; border-radius: 4px 4px 0 0; background: linear-gradient(to top, var(--green-dark), var(--green)); transition: height 0.6s cubic-bezier(0.4,0,0.2,1); min-height: 4px; cursor: pointer; }
     .bar:hover { filter: brightness(1.2); }
-    .bar-label {
-      font-size: 9px; color: var(--muted); white-space: nowrap;
-    }
-    .bar-val {
-      font-size: 10px; font-weight: 600; color: var(--green);
-      margin-bottom: 2px;
-    }
+    .bar-label { font-size: 9px; color: var(--muted); white-space: nowrap; }
+    .bar-val { font-size: 10px; font-weight: 600; color: var(--green); margin-bottom: 2px; }
 
-    /* ─── CONTACTS TABLE ─────────────────────────────────── */
-    .search-row {
-      display: flex; gap: 10px; margin-bottom: 16px;
-    }
+    /* ─── CONTACTS TABLE ── */
+    .search-row { display: flex; gap: 10px; margin-bottom: 16px; }
     .search-wrap { flex: 1; position: relative; }
     .search-wrap .icon { position: absolute; left: 12px; top: 50%; transform: translateY(-50%); font-size: 15px; }
-    .search-input {
-      width: 100%; padding: 10px 12px 10px 36px;
-      background: var(--surface2); border: 1px solid var(--border);
-      border-radius: var(--radius-sm); color: var(--text);
-      font-family: var(--font-body); font-size: 14px;
-      transition: all var(--transition);
-    }
+    .search-input { width: 100%; padding: 10px 12px 10px 36px; background: var(--surface2); border: 1px solid var(--border); border-radius: var(--radius-sm); color: var(--text); font-family: var(--font-body); font-size: 14px; transition: all var(--transition); }
     .search-input:focus { outline: none; border-color: var(--green); box-shadow: 0 0 0 3px var(--green-glow); }
     .search-input::placeholder { color: var(--muted); }
-    .bulk-del-btn {
-      padding: 10px 16px; border-radius: var(--radius-sm);
-      background: rgba(255,77,109,0.1); border: 1px solid rgba(255,77,109,0.25);
-      color: var(--danger); font-size: 13px; cursor: pointer;
-      transition: all var(--transition); white-space: nowrap;
-    }
+    .bulk-del-btn { padding: 10px 16px; border-radius: var(--radius-sm); background: rgba(255,77,109,0.1); border: 1px solid rgba(255,77,109,0.25); color: var(--danger); font-size: 13px; cursor: pointer; transition: all var(--transition); white-space: nowrap; }
     .bulk-del-btn:hover { background: rgba(255,77,109,0.2); }
-
     .table-wrap { overflow-x: auto; }
     table { width: 100%; border-collapse: collapse; font-size: 14px; }
-    thead th {
-      padding: 10px 12px; text-align: left;
-      font-size: 11px; color: var(--muted); text-transform: uppercase; letter-spacing: 1px;
-      border-bottom: 1px solid var(--border); white-space: nowrap;
-    }
+    thead th { padding: 10px 12px; text-align: left; font-size: 11px; color: var(--muted); text-transform: uppercase; letter-spacing: 1px; border-bottom: 1px solid var(--border); white-space: nowrap; }
     thead th input[type="checkbox"] { cursor: pointer; accent-color: var(--green); }
     tbody tr { transition: background var(--transition); }
-    tbody tr:hover { background: rgba(255,255,255,0.03); }
+    tbody tr:not(.ad-in-table):hover { background: rgba(255,255,255,0.03); }
     tbody td { padding: 12px; border-bottom: 1px solid var(--border); vertical-align: middle; }
     .contact-name { font-weight: 500; }
     .contact-phone { color: var(--muted); font-size: 13px; }
-    .reason-badge {
-      padding: 3px 10px; border-radius: 50px; font-size: 12px; font-weight: 500;
-    }
+    .reason-badge { padding: 3px 10px; border-radius: 50px; font-size: 12px; font-weight: 500; }
     .reason-badge.doc  { background: rgba(79,139,255,0.12); color: #4f8bff; }
     .reason-badge.hi   { background: rgba(37,211,102,0.1);  color: var(--green); }
     .reason-badge.test { background: rgba(255,170,0,0.1);   color: var(--warn); }
     .reason-badge.other{ background: rgba(167,139,250,0.1); color: #a78bfa; }
     .time-ago { font-size: 12px; color: var(--muted); white-space: nowrap; }
-    .action-link {
-      display: inline-flex; align-items: center; gap: 5px;
-      padding: 5px 12px; border-radius: 50px; font-size: 12px; font-weight: 500;
-      background: rgba(37,211,102,0.1); color: var(--green);
-      text-decoration: none; border: 1px solid rgba(37,211,102,0.2);
-      transition: all var(--transition); white-space: nowrap;
-    }
+    .action-link { display: inline-flex; align-items: center; gap: 5px; padding: 5px 12px; border-radius: 50px; font-size: 12px; font-weight: 500; background: rgba(37,211,102,0.1); color: var(--green); text-decoration: none; border: 1px solid rgba(37,211,102,0.2); transition: all var(--transition); white-space: nowrap; }
     .action-link:hover { background: rgba(37,211,102,0.2); }
-    .del-btn {
-      padding: 5px 10px; border-radius: 50px; font-size: 12px;
-      background: transparent; border: 1px solid rgba(255,77,109,0.3);
-      color: var(--danger); cursor: pointer; transition: all var(--transition);
-    }
+    .del-btn { padding: 5px 10px; border-radius: 50px; font-size: 12px; background: transparent; border: 1px solid rgba(255,77,109,0.3); color: var(--danger); cursor: pointer; transition: all var(--transition); }
     .del-btn:hover { background: rgba(255,77,109,0.12); }
-
-    .empty-state {
-      text-align: center; padding: 48px 20px;
-    }
+    .empty-state { text-align: center; padding: 48px 20px; }
     .empty-state .empty-icon { font-size: 48px; margin-bottom: 12px; opacity: 0.4; }
     .empty-state p { color: var(--muted); font-size: 14px; }
-
-    /* ─── FOOTER ─────────────────────────────────────────── */
-    .footer-note {
-      text-align: center; margin-top: 16px;
-      font-size: 12px; color: var(--muted);
-    }
+    .footer-note { text-align: center; margin-top: 16px; font-size: 12px; color: var(--muted); }
     .footer-note span { color: var(--green); font-weight: 600; }
 
-    /* ─── FADE IN ────────────────────────────────────────── */
-    .fade-in {
-      animation: fadeIn 0.5s ease forwards;
+    /* ══════════════════════════════════════
+       REVENUE / ADVERTISE VIEW
+    ══════════════════════════════════════ */
+    .rev-view {
+      max-width: 1140px; margin: 0 auto; padding: 40px 24px 80px;
     }
-    @keyframes fadeIn { from { opacity: 0; transform: translateY(12px); } to { opacity: 1; transform: none; } }
-    .card { animation: fadeIn 0.5s ease both; }
-    .right-col .card:nth-child(1) { animation-delay: 0.05s; }
-    .right-col .card:nth-child(2) { animation-delay: 0.1s; }
+    .rev-hero {
+      text-align: center; padding: 60px 20px 48px; position: relative; overflow: hidden;
+    }
+    .rev-hero::before {
+      content: ''; position: absolute; inset: 0;
+      background: radial-gradient(ellipse 80% 60% at 50% 0%, rgba(245,200,66,0.08), transparent);
+      pointer-events: none;
+    }
+    .rev-hero-badge {
+      display: inline-flex; align-items: center; gap: 8px;
+      padding: 6px 16px; border-radius: 50px;
+      background: rgba(245,200,66,0.1); border: 1px solid rgba(245,200,66,0.3);
+      font-size: 12px; font-weight: 600; color: var(--gold); letter-spacing: 1px;
+      text-transform: uppercase; margin-bottom: 20px;
+    }
+    .rev-hero h1 { font-family: var(--font-head); font-size: 42px; font-weight: 800; line-height: 1.1; letter-spacing: -1px; margin-bottom: 16px; }
+    .rev-hero h1 span { color: var(--gold); }
+    .rev-hero p { color: var(--muted); font-size: 17px; max-width: 540px; margin: 0 auto 32px; line-height: 1.7; }
+    .rev-hero-stats { display: flex; justify-content: center; gap: 40px; flex-wrap: wrap; }
+    .rev-hero-stat { text-align: center; }
+    .rev-hero-stat .big { font-family: var(--font-head); font-size: 32px; font-weight: 800; color: var(--gold); }
+    .rev-hero-stat .lbl { font-size: 12px; color: var(--muted); text-transform: uppercase; letter-spacing: 1px; margin-top: 2px; }
+
+    /* ─── AD PACKAGES ── */
+    .rev-section-title { font-family: var(--font-head); font-size: 22px; font-weight: 700; margin-bottom: 8px; }
+    .rev-section-title span { color: var(--gold); }
+    .rev-section-sub { color: var(--muted); font-size: 14px; margin-bottom: 28px; }
+    .packages-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 20px; margin-bottom: 48px; }
+    @media (max-width: 780px) { .packages-grid { grid-template-columns: 1fr; } }
+    .pkg-card {
+      background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius);
+      padding: 28px; position: relative; transition: all var(--transition); cursor: default;
+    }
+    .pkg-card:hover { transform: translateY(-4px); box-shadow: 0 16px 48px rgba(0,0,0,0.4); }
+    .pkg-card.featured { border-color: rgba(245,200,66,0.4); }
+    .pkg-card.featured::before { content: ''; position: absolute; inset: 0; border-radius: var(--radius); background: linear-gradient(135deg, rgba(245,200,66,0.04), transparent); pointer-events: none; }
+    .pkg-popular { position: absolute; top: -12px; left: 50%; transform: translateX(-50%); padding: 4px 16px; background: var(--gold); color: #000; border-radius: 50px; font-size: 11px; font-weight: 700; letter-spacing: 1px; text-transform: uppercase; white-space: nowrap; }
+    .pkg-icon { font-size: 36px; margin-bottom: 14px; }
+    .pkg-name { font-family: var(--font-head); font-size: 18px; font-weight: 700; margin-bottom: 6px; }
+    .pkg-price { font-family: var(--font-head); font-size: 32px; font-weight: 800; color: var(--gold); line-height: 1; margin-bottom: 4px; }
+    .pkg-price sup { font-size: 18px; vertical-align: super; }
+    .pkg-price-period { font-size: 12px; color: var(--muted); margin-bottom: 16px; }
+    .pkg-features { list-style: none; margin-bottom: 24px; display: flex; flex-direction: column; gap: 10px; }
+    .pkg-features li { display: flex; align-items: flex-start; gap: 10px; font-size: 14px; color: var(--muted); }
+    .pkg-features li .check { color: var(--green); font-size: 14px; flex-shrink: 0; }
+    .pkg-features li.included { color: var(--text); }
+    .pkg-cta {
+      width: 100%; padding: 13px; border-radius: var(--radius-sm); border: none;
+      font-family: var(--font-head); font-size: 15px; font-weight: 700; cursor: pointer;
+      transition: all var(--transition);
+    }
+    .pkg-cta.outline { background: transparent; border: 1px solid var(--border); color: var(--text); }
+    .pkg-cta.outline:hover { border-color: var(--gold); color: var(--gold); }
+    .pkg-cta.gold-btn { background: linear-gradient(135deg, var(--gold), #d4a000); color: #000; box-shadow: 0 4px 20px var(--gold-glow); }
+    .pkg-cta.gold-btn:hover { transform: translateY(-1px); box-shadow: 0 8px 28px rgba(245,200,66,0.35); }
+
+    /* ─── AD PLACEMENTS GUIDE ── */
+    .placements-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; margin-bottom: 48px; }
+    @media (max-width: 700px) { .placements-grid { grid-template-columns: 1fr; } }
+    .placement-card {
+      background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius); padding: 24px;
+      transition: all var(--transition);
+    }
+    .placement-card:hover { border-color: rgba(245,200,66,0.25); }
+    .placement-top { display: flex; align-items: center; gap: 12px; margin-bottom: 14px; }
+    .placement-icon { width: 44px; height: 44px; border-radius: 12px; display: flex; align-items: center; justify-content: center; font-size: 22px; flex-shrink: 0; }
+    .pi-green { background: rgba(37,211,102,0.12); }
+    .pi-gold  { background: rgba(245,200,66,0.12); }
+    .pi-blue  { background: rgba(79,139,255,0.12); }
+    .pi-purple{ background: rgba(167,139,250,0.12); }
+    .placement-name { font-family: var(--font-head); font-size: 16px; font-weight: 700; }
+    .placement-dims { font-size: 12px; color: var(--muted); }
+    .placement-desc { font-size: 14px; color: var(--muted); line-height: 1.65; margin-bottom: 14px; }
+    .placement-meta { display: flex; gap: 10px; flex-wrap: wrap; }
+    .meta-pill { padding: 4px 12px; border-radius: 50px; font-size: 12px; font-weight: 500; }
+    .mp-green { background: rgba(37,211,102,0.1); color: var(--green); }
+    .mp-gold  { background: rgba(245,200,66,0.1); color: var(--gold); }
+    .mp-blue  { background: rgba(79,139,255,0.1); color: var(--accent); }
+
+    /* ─── HOW IT WORKS ── */
+    .how-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 16px; margin-bottom: 48px; }
+    @media (max-width: 780px) { .how-grid { grid-template-columns: 1fr 1fr; } }
+    @media (max-width: 480px) { .how-grid { grid-template-columns: 1fr; } }
+    .how-step { background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius); padding: 20px; text-align: center; transition: all var(--transition); }
+    .how-step:hover { border-color: rgba(245,200,66,0.2); transform: translateY(-2px); }
+    .how-num { width: 36px; height: 36px; border-radius: 50%; background: rgba(245,200,66,0.12); border: 1px solid rgba(245,200,66,0.25); display: flex; align-items: center; justify-content: center; font-family: var(--font-head); font-size: 16px; font-weight: 800; color: var(--gold); margin: 0 auto 12px; }
+    .how-title { font-family: var(--font-head); font-size: 14px; font-weight: 700; margin-bottom: 6px; }
+    .how-desc { font-size: 13px; color: var(--muted); line-height: 1.6; }
+
+    /* ─── CONTACT ADVERTISER ── */
+    .advertise-cta-box {
+      background: linear-gradient(135deg, #1a1a08, #0f1f2e);
+      border: 1px solid rgba(245,200,66,0.25); border-radius: var(--radius);
+      padding: 40px; text-align: center; position: relative; overflow: hidden; margin-bottom: 48px;
+    }
+    .advertise-cta-box::before { content: ''; position: absolute; inset: 0; background: radial-gradient(ellipse 60% 60% at 50% 0%, rgba(245,200,66,0.06), transparent); }
+    .advertise-cta-box h2 { font-family: var(--font-head); font-size: 28px; font-weight: 800; margin-bottom: 10px; }
+    .advertise-cta-box h2 span { color: var(--gold); }
+    .advertise-cta-box p { color: var(--muted); font-size: 15px; margin-bottom: 28px; max-width: 460px; margin-left: auto; margin-right: auto; }
+    .cta-row { display: flex; gap: 14px; justify-content: center; flex-wrap: wrap; }
+    .wa-cta-btn { display: flex; align-items: center; gap: 8px; padding: 14px 28px; border-radius: var(--radius-sm); background: linear-gradient(135deg, var(--green), var(--green-dark)); color: #fff; font-family: var(--font-head); font-size: 15px; font-weight: 700; border: none; cursor: pointer; transition: all var(--transition); box-shadow: 0 4px 20px var(--green-glow); }
+    .wa-cta-btn:hover { transform: translateY(-2px); box-shadow: 0 8px 32px rgba(37,211,102,0.4); }
+    .email-cta-btn { display: flex; align-items: center; gap: 8px; padding: 14px 28px; border-radius: var(--radius-sm); background: transparent; border: 1px solid rgba(245,200,66,0.4); color: var(--gold); font-family: var(--font-head); font-size: 15px; font-weight: 700; cursor: pointer; transition: all var(--transition); }
+    .email-cta-btn:hover { background: rgba(245,200,66,0.08); transform: translateY(-2px); }
+
+    /* ─── REVENUE ESTIMATOR ── */
+    .estimator-card { background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius); padding: 28px; margin-bottom: 48px; }
+    .estimator-card h3 { font-family: var(--font-head); font-size: 18px; font-weight: 700; margin-bottom: 6px; }
+    .estimator-card h3 span { color: var(--gold); }
+    .estimator-card .sub { color: var(--muted); font-size: 13px; margin-bottom: 24px; }
+    .estimator-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; align-items: center; }
+    @media (max-width: 600px) { .estimator-grid { grid-template-columns: 1fr; } }
+    .est-controls { display: flex; flex-direction: column; gap: 16px; }
+    .est-row label { font-size: 12px; color: var(--muted); text-transform: uppercase; letter-spacing: 1px; display: block; margin-bottom: 8px; }
+    .est-slider { width: 100%; accent-color: var(--gold); }
+    .est-value { font-family: var(--font-head); font-size: 14px; font-weight: 700; color: var(--gold); }
+    .est-result {
+      background: linear-gradient(135deg, rgba(245,200,66,0.06), transparent);
+      border: 1px solid rgba(245,200,66,0.2); border-radius: var(--radius-sm);
+      padding: 24px; text-align: center;
+    }
+    .est-label { font-size: 12px; color: var(--muted); text-transform: uppercase; letter-spacing: 1px; margin-bottom: 6px; }
+    .est-monthly { font-family: var(--font-head); font-size: 44px; font-weight: 800; color: var(--gold); line-height: 1; text-shadow: 0 0 30px var(--gold-glow); }
+    .est-note { font-size: 12px; color: var(--muted); margin-top: 8px; }
+
+    /* ─── REVIEW MODEL ── */
+    .review-view { max-width: 1140px; margin: 0 auto; padding: 40px 24px 80px; }
+    .review-hero { background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius); padding: 40px; margin-bottom: 28px; display: flex; align-items: center; gap: 28px; flex-wrap: wrap; }
+    .review-hero-icon { font-size: 64px; flex-shrink: 0; }
+    .review-hero-text h1 { font-family: var(--font-head); font-size: 30px; font-weight: 800; letter-spacing: -0.5px; margin-bottom: 8px; }
+    .review-hero-text h1 span { color: var(--accent); }
+    .review-hero-text p { color: var(--muted); font-size: 15px; max-width: 500px; line-height: 1.7; }
+    .rating-summary { display: flex; align-items: center; gap: 20px; margin-top: 16px; flex-wrap: wrap; }
+    .big-rating { font-family: var(--font-head); font-size: 54px; font-weight: 800; color: var(--gold); line-height: 1; }
+    .stars-col .stars { color: var(--gold); font-size: 22px; letter-spacing: 2px; }
+    .stars-col .total { font-size: 13px; color: var(--muted); margin-top: 4px; }
+    .rating-bars { flex: 1; min-width: 160px; }
+    .rbar-row { display: flex; align-items: center; gap: 8px; margin-bottom: 6px; }
+    .rbar-lbl { font-size: 12px; color: var(--muted); width: 40px; text-align: right; }
+    .rbar-track { flex: 1; height: 6px; background: var(--surface2); border-radius: 4px; overflow: hidden; }
+    .rbar-fill { height: 100%; background: var(--gold); border-radius: 4px; transition: width 1s cubic-bezier(0.4,0,0.2,1); }
+    .rbar-count { font-size: 12px; color: var(--muted); width: 24px; }
+
+    .reviews-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; margin-bottom: 28px; }
+    @media (max-width: 700px) { .reviews-grid { grid-template-columns: 1fr; } }
+    .review-card { background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius); padding: 22px; transition: all var(--transition); }
+    .review-card:hover { border-color: rgba(245,200,66,0.2); transform: translateY(-2px); }
+    .review-header { display: flex; align-items: center; gap: 12px; margin-bottom: 12px; }
+    .reviewer-avatar { width: 40px; height: 40px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 18px; font-weight: 700; color: #fff; flex-shrink: 0; }
+    .reviewer-name { font-weight: 600; font-size: 14px; }
+    .reviewer-type { font-size: 12px; color: var(--muted); }
+    .review-stars { color: var(--gold); font-size: 14px; letter-spacing: 1px; margin-left: auto; }
+    .review-text { font-size: 14px; color: var(--muted); line-height: 1.7; margin-bottom: 10px; }
+    .review-date { font-size: 12px; color: var(--muted); opacity: 0.6; }
+
+    /* ─── WRITE REVIEW ── */
+    .write-review-card { background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius); padding: 28px; }
+    .write-review-card h3 { font-family: var(--font-head); font-size: 18px; font-weight: 700; margin-bottom: 6px; }
+    .write-review-card h3 span { color: var(--accent); }
+    .write-review-card .sub { color: var(--muted); font-size: 13px; margin-bottom: 24px; }
+    .star-picker { display: flex; gap: 8px; margin-bottom: 18px; }
+    .star-btn { font-size: 28px; cursor: pointer; opacity: 0.3; transition: all 0.15s; filter: grayscale(1); }
+    .star-btn.active { opacity: 1; filter: none; transform: scale(1.15); }
+    .review-textarea { width: 100%; padding: 14px; background: var(--surface2); border: 1px solid var(--border); border-radius: var(--radius-sm); color: var(--text); font-family: var(--font-body); font-size: 14px; resize: vertical; min-height: 100px; transition: all var(--transition); }
+    .review-textarea:focus { outline: none; border-color: var(--accent); box-shadow: 0 0 0 3px rgba(79,139,255,0.15); }
+    .review-textarea::placeholder { color: var(--muted); }
+    .review-form-row { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; margin-bottom: 14px; }
+    @media (max-width: 560px) { .review-form-row { grid-template-columns: 1fr; } }
+    .submit-review-btn { padding: 14px 28px; border-radius: var(--radius-sm); background: linear-gradient(135deg, var(--accent), #2563eb); color: #fff; font-family: var(--font-head); font-size: 15px; font-weight: 700; border: none; cursor: pointer; transition: all var(--transition); box-shadow: 0 4px 20px rgba(79,139,255,0.3); }
+    .submit-review-btn:hover { transform: translateY(-2px); box-shadow: 0 8px 28px rgba(79,139,255,0.4); }
+    .char-count { font-size: 12px; color: var(--muted); text-align: right; margin-top: 4px; }
   </style>
 </head>
 <body>
-
-<!-- TOAST CONTAINER -->
 <div id="toastContainer"></div>
 
 <!-- TOP BAR -->
@@ -485,182 +518,445 @@
     </div>
   </div>
   <div class="topbar-actions">
-    <span class="shortcut-hint">⌘ + Enter to send</span>
+    <div class="tab-nav">
+      <button class="tab-btn active" onclick="switchView('portal')">💬 Portal</button>
+      <button class="tab-btn" onclick="switchView('reviews')">⭐ Reviews</button>
+      <button class="tab-btn gold-tab" onclick="switchView('advertise')">💰 Advertise</button>
+    </div>
     <button class="theme-toggle" id="themeToggle" title="Toggle theme">🌙</button>
   </div>
 </header>
 
-<!-- PAGE -->
-<main class="page">
+<!-- ═══════════ PORTAL VIEW ═══════════ -->
+<div id="viewPortal" class="view active">
 
-  <!-- ── LEFT: INPUT CARD ── -->
-  <aside class="left-col">
-    <div class="card">
-      <div class="hero-header">
-        <div class="hero-icon">💬</div>
-        <div class="hero-title">WhatsApp <span>Connect</span></div>
-        <div class="hero-sub">Enter details and open instantly</div>
-        <div class="hero-sub">Data stored locally in your browser</div>
-      </div>
-
-      <!-- Name -->
-      <div class="field">
-        <label>Full Name</label>
-        <div class="input-wrap">
-          <span class="icon">👤</span>
-          <input type="text" id="name" placeholder="e.g. Rahul Sharma" autocomplete="off" />
-        </div>
-        <div id="nameError" class="field-error"></div>
-      </div>
-
-      <!-- Phone -->
-      <div class="field">
-        <label>Phone Number</label>
-        <div class="input-wrap">
-          <span class="icon">📞</span>
-          <input type="tel" id="phone" placeholder="e.g. 9876543210" autocomplete="off" />
-        </div>
-        <div class="phone-badge">🇮🇳 +91 added automatically</div>
-        <div id="phoneError" class="field-error"></div>
-      </div>
-
-      <!-- Reason -->
-      <div class="field">
-        <label>Reason for Connect</label>
-        <div class="tag-row" id="tagRow">
-          <div class="tag-chip doc  active" data-value="Send Document &amp; Photo">📎 Document</div>
-          <div class="tag-chip hi"           data-value="Send Hi Hello">👋 Hi Hello</div>
-          <div class="tag-chip test"         data-value="Testing">🧪 Testing</div>
-          <div class="tag-chip other"        data-value="Other">💬 Other</div>
-        </div>
-        <input type="hidden" id="reason" value="Send Document &amp; Photo" />
-      </div>
-
-      <!-- CTA -->
-      <button class="cta-btn" id="whatsappBtn">
-        <span>💬</span> Open WhatsApp & Save
-      </button>
-
-      <div id="linkPreview" class="link-preview">
-        🔗 <a id="linkAnchor" href="#" target="_blank" rel="noopener noreferrer"></a>
-        &nbsp;<small style="color:var(--muted)">(click if not redirected)</small>
-      </div>
-
-      <!-- Play Banner -->
-      <div class="play-banner">
-        <div class="play-banner-text">
-          <h4>🚀 Official App</h4>
-          <p>Faster experience on Google Play</p>
-        </div>
-        <a href="#" class="play-pill" onclick="showToast('Opening Google Play…','info'); return false;">📲 Get App</a>
-      </div>
-
-      <div class="footer-note">Powered by · <span>Zalinga Technologies</span></div>
-    </div>
-  </aside>
-
-  <!-- ── RIGHT: ANALYTICS + CONTACTS ── -->
-  <div class="right-col">
-
-    <!-- Analytics -->
-    <div class="card">
-      <div class="section-header">
-        <div class="section-title">📊 <span>Analytics</span></div>
-        <button class="btn-sm danger" id="resetBtn">Reset</button>
-      </div>
-
-      <div class="stats-grid">
-        <div class="stat-card">
-          <div class="stat-label">Today</div>
-          <div class="stat-number" id="todayCount">0</div>
-        </div>
-        <div class="stat-card">
-          <div class="stat-label">This Month</div>
-          <div class="stat-number" id="monthCount">0</div>
-        </div>
-        <div class="stat-card">
-          <div class="stat-label">All Time</div>
-          <div class="stat-number" id="totalCount">0</div>
+  <!-- Leaderboard Ad -->
+  <div class="ad-leaderboard">
+    <div class="ad-leaderboard-inner" onclick="showToast('Ad clicked! Contact us to place your ad here.','gold')" style="cursor:pointer">
+      <div class="ad-leader-left">
+        <div class="ad-leader-badge">🏢</div>
+        <div class="ad-leader-text">
+          <h3>Your Business Here — Reach 10,000+ Daily Active Users</h3>
+          <p>Premium leaderboard banner · High visibility · Best ROI in local market</p>
         </div>
       </div>
-
-      <div class="chart-wrap">
-        <div class="chart-title">Daily connections — last 14 days</div>
-        <div class="bar-chart" id="barChart">
-          <div style="color:var(--muted);font-size:13px;padding:8px">No data yet.</div>
-        </div>
+      <div style="display:flex;align-items:center;gap:14px;flex-shrink:0">
+        <span class="ad-slot-label-top">Sponsored</span>
+        <button class="ad-leader-cta" onclick="switchView('advertise');event.stopPropagation()">Advertise Here →</button>
       </div>
     </div>
+  </div>
 
-    <!-- Contacts -->
-    <div class="card">
-      <div class="section-header">
-        <div class="section-title">📋 <span>Contacts</span></div>
-        <button class="btn-sm" id="exportBtn">⬇ Export CSV</button>
-      </div>
-
-      <div class="search-row">
-        <div class="search-wrap">
-          <span class="icon">🔍</span>
-          <input type="text" id="searchInput" class="search-input" placeholder="Search name or phone…" />
+  <main class="page">
+    <!-- LEFT: INPUT -->
+    <aside class="left-col">
+      <div class="card">
+        <div class="hero-header">
+          <div class="hero-icon">💬</div>
+          <div class="hero-title">WhatsApp <span>Connect</span></div>
+          <div class="hero-sub">Enter details and open instantly</div>
+          <div class="hero-sub" style="font-size:11px;margin-top:4px">Data stored locally in your browser</div>
         </div>
-        <button class="bulk-del-btn" id="bulkDelBtn" style="display:none">🗑 Delete Selected</button>
+        <div class="field">
+          <label>Full Name</label>
+          <div class="input-wrap"><span class="icon">👤</span><input type="text" id="name" placeholder="e.g. Rahul Sharma" autocomplete="off" /></div>
+          <div id="nameError" class="field-error"></div>
+        </div>
+        <div class="field">
+          <label>Phone Number</label>
+          <div class="input-wrap"><span class="icon">📞</span><input type="tel" id="phone" placeholder="e.g. 9876543210" autocomplete="off" /></div>
+          <div class="phone-badge">🇮🇳 +91 added automatically</div>
+          <div id="phoneError" class="field-error"></div>
+        </div>
+        <div class="field">
+          <label>Reason for Connect</label>
+          <div class="tag-row" id="tagRow">
+            <div class="tag-chip doc active" data-value="Send Document &amp; Photo">📎 Document</div>
+            <div class="tag-chip hi" data-value="Send Hi Hello">👋 Hi Hello</div>
+            <div class="tag-chip test" data-value="Testing">🧪 Testing</div>
+            <div class="tag-chip other" data-value="Other">💬 Other</div>
+          </div>
+          <input type="hidden" id="reason" value="Send Document &amp; Photo" />
+        </div>
+        <button class="cta-btn" id="whatsappBtn">💬 Open WhatsApp & Save</button>
+        <div id="linkPreview" class="link-preview">🔗 <a id="linkAnchor" href="#" target="_blank" rel="noopener noreferrer"></a> <small style="color:var(--muted)">(click if not redirected)</small></div>
+        <div class="footer-note" style="margin-top:20px">Powered by · <span>Zalinga Technologies</span></div>
       </div>
 
-      <div class="table-wrap">
-        <table id="contactsTable">
-          <thead>
-            <tr>
-              <th><input type="checkbox" id="selectAll" /></th>
-              <th>Contact</th>
-              <th>Reason</th>
-              <th>When</th>
-              <th>Link</th>
-              <th></th>
-            </tr>
-          </thead>
-          <tbody id="tableBody"></tbody>
-        </table>
+      <!-- SIDEBAR AD -->
+      <div class="ad-slot ad-sidebar" onclick="switchView('advertise')">
+        <span class="ad-slot-label">Ad</span>
+        <div class="ad-sidebar-demo-icon">🛒</div>
+        <div class="ad-sidebar-demo-title">Your Ad Here</div>
+        <div class="ad-sidebar-demo-sub">250 × 120 · Sidebar Slot</div>
+        <div class="ad-sidebar-demo-cta">Book This Space →</div>
       </div>
-      <div id="emptyState" class="empty-state" style="display:none">
-        <div class="empty-icon">📭</div>
-        <p>No contacts saved yet.<br>Connect someone to see them here.</p>
+    </aside>
+
+    <!-- RIGHT: ANALYTICS + CONTACTS -->
+    <div class="right-col">
+      <div class="card">
+        <div class="section-header">
+          <div class="section-title">📊 <span>Analytics</span></div>
+          <button class="btn-sm danger" id="resetBtn">Reset</button>
+        </div>
+        <div class="stats-grid">
+          <div class="stat-card"><div class="stat-label">Today</div><div class="stat-number" id="todayCount">0</div></div>
+          <div class="stat-card"><div class="stat-label">This Month</div><div class="stat-number" id="monthCount">0</div></div>
+          <div class="stat-card"><div class="stat-label">All Time</div><div class="stat-number" id="totalCount">0</div></div>
+        </div>
+        <div class="chart-wrap">
+          <div class="chart-title">Daily connections — last 14 days</div>
+          <div class="bar-chart" id="barChart"><div style="color:var(--muted);font-size:13px;padding:8px">No data yet.</div></div>
+        </div>
+      </div>
+
+      <div class="card">
+        <div class="section-header">
+          <div class="section-title">📋 <span>Contacts</span></div>
+          <button class="btn-sm" id="exportBtn">⬇ Export CSV</button>
+        </div>
+        <div class="search-row">
+          <div class="search-wrap"><span class="icon">🔍</span><input type="text" id="searchInput" class="search-input" placeholder="Search name or phone…" /></div>
+          <button class="bulk-del-btn" id="bulkDelBtn" style="display:none">🗑 Delete Selected</button>
+        </div>
+        <div class="table-wrap">
+          <table id="contactsTable">
+            <thead>
+              <tr>
+                <th><input type="checkbox" id="selectAll" /></th>
+                <th>Contact</th>
+                <th>Reason</th>
+                <th>When</th>
+                <th>Link</th>
+                <th></th>
+              </tr>
+            </thead>
+            <tbody id="tableBody"></tbody>
+          </table>
+        </div>
+        <div id="emptyState" class="empty-state" style="display:none">
+          <div class="empty-icon">📭</div>
+          <p>No contacts saved yet.<br>Connect someone to see them here.</p>
+        </div>
+      </div>
+    </div>
+  </main>
+</div>
+
+<!-- ═══════════ REVIEWS VIEW ═══════════ -->
+<div id="viewReviews" class="view">
+  <div class="review-view">
+    <!-- Hero Summary -->
+    <div class="review-hero">
+      <div class="review-hero-icon">⭐</div>
+      <div class="review-hero-text">
+        <h1>User <span>Reviews</span></h1>
+        <p>Real feedback from real users of WAConnect Portal by Zalinga Technologies. We value every opinion.</p>
+        <div class="rating-summary">
+          <div class="big-rating" id="avgRating">4.7</div>
+          <div class="stars-col">
+            <div class="stars" id="summaryStars">★★★★★</div>
+            <div class="total" id="totalReviews">12 reviews</div>
+          </div>
+          <div class="rating-bars" id="ratingBars">
+            <div class="rbar-row"><span class="rbar-lbl">5★</span><div class="rbar-track"><div class="rbar-fill" id="r5" style="width:75%"></div></div><span class="rbar-count" id="c5">9</span></div>
+            <div class="rbar-row"><span class="rbar-lbl">4★</span><div class="rbar-track"><div class="rbar-fill" id="r4" style="width:17%"></div></div><span class="rbar-count" id="c4">2</span></div>
+            <div class="rbar-row"><span class="rbar-lbl">3★</span><div class="rbar-track"><div class="rbar-fill" id="r3" style="width:8%"></div></div><span class="rbar-count" id="c3">1</span></div>
+            <div class="rbar-row"><span class="rbar-lbl">2★</span><div class="rbar-track"><div class="rbar-fill" id="r2" style="width:0%"></div></div><span class="rbar-count" id="c2">0</span></div>
+            <div class="rbar-row"><span class="rbar-lbl">1★</span><div class="rbar-track"><div class="rbar-fill" id="r1" style="width:0%"></div></div><span class="rbar-count" id="c1">0</span></div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Existing Reviews -->
+    <div style="margin-bottom:12px;display:flex;align-items:center;justify-content:space-between;">
+      <div style="font-family:var(--font-head);font-size:18px;font-weight:700">What People Say <span style="color:var(--accent)">About WAConnect</span></div>
+    </div>
+    <div class="reviews-grid" id="reviewsGrid">
+      <!-- Populated by JS -->
+    </div>
+
+    <!-- Write Review -->
+    <div class="write-review-card">
+      <h3>Share Your <span>Experience</span></h3>
+      <div class="sub">Your feedback helps us improve and helps others decide. Takes 30 seconds.</div>
+      <div class="review-form-row">
+        <div class="field" style="margin-bottom:0">
+          <label>Your Name</label>
+          <div class="input-wrap"><span class="icon">👤</span><input type="text" id="reviewName" placeholder="e.g. Priya Verma" /></div>
+        </div>
+        <div class="field" style="margin-bottom:0">
+          <label>You Are A</label>
+          <div class="input-wrap">
+            <span class="icon">💼</span>
+            <select id="reviewRole">
+              <option value="Business Owner">Business Owner</option>
+              <option value="Sales Executive">Sales Executive</option>
+              <option value="Freelancer">Freelancer</option>
+              <option value="Student">Student</option>
+              <option value="Other">Other</option>
+            </select>
+          </div>
+        </div>
+      </div>
+      <div style="margin-bottom:14px">
+        <label style="font-size:12px;color:var(--muted);text-transform:uppercase;letter-spacing:1px;display:block;margin-bottom:8px">Your Rating</label>
+        <div class="star-picker" id="starPicker">
+          <span class="star-btn" data-star="1">⭐</span>
+          <span class="star-btn" data-star="2">⭐</span>
+          <span class="star-btn" data-star="3">⭐</span>
+          <span class="star-btn" data-star="4">⭐</span>
+          <span class="star-btn" data-star="5">⭐</span>
+        </div>
+      </div>
+      <textarea class="review-textarea" id="reviewText" placeholder="Tell us what you love, what could be better, and how WAConnect has helped your workflow…" maxlength="400"></textarea>
+      <div class="char-count"><span id="charCount">0</span>/400</div>
+      <br>
+      <button class="submit-review-btn" id="submitReviewBtn">✨ Submit Review</button>
+    </div>
+  </div>
+</div>
+
+<!-- ═══════════ ADVERTISE VIEW ═══════════ -->
+<div id="viewAdvertise" class="view">
+  <div class="rev-view">
+
+    <!-- Hero -->
+    <div class="rev-hero">
+      <div class="rev-hero-badge">💰 Monetisation Guide</div>
+      <h1>Grow Your Business<br>With <span>WAConnect Ads</span></h1>
+      <p>Reach a highly targeted audience of business owners, sales teams, and WhatsApp-heavy users right inside the portal they use daily.</p>
+      <div class="rev-hero-stats">
+        <div class="rev-hero-stat"><div class="big">10K+</div><div class="lbl">Daily Users</div></div>
+        <div class="rev-hero-stat"><div class="big">35K+</div><div class="lbl">Monthly Connects</div></div>
+        <div class="rev-hero-stat"><div class="big">4.7★</div><div class="lbl">User Rating</div></div>
+        <div class="rev-hero-stat"><div class="big">94%</div><div class="lbl">Return Visitors</div></div>
+      </div>
+    </div>
+
+    <!-- Revenue Estimator -->
+    <div class="estimator-card">
+      <h3>💹 Your Revenue <span>Estimator</span></h3>
+      <div class="sub">See how much WAConnect can earn as an ad platform — adjust the sliders to match your scale.</div>
+      <div class="estimator-grid">
+        <div class="est-controls">
+          <div class="est-row">
+            <label>Daily Active Users: <span class="est-value" id="dauVal">5,000</span></label>
+            <input type="range" class="est-slider" id="dauSlider" min="500" max="50000" step="500" value="5000" />
+          </div>
+          <div class="est-row">
+            <label>Active Ad Slots: <span class="est-value" id="slotVal">3</span></label>
+            <input type="range" class="est-slider" id="slotSlider" min="1" max="6" step="1" value="3" />
+          </div>
+          <div class="est-row">
+            <label>Avg CPM (₹): <span class="est-value" id="cpmVal">₹80</span></label>
+            <input type="range" class="est-slider" id="cpmSlider" min="20" max="200" step="10" value="80" />
+          </div>
+        </div>
+        <div class="est-result">
+          <div class="est-label">Estimated Monthly Revenue</div>
+          <div class="est-monthly" id="estMonthly">₹0</div>
+          <div class="est-note">Based on 30 days × DAU × Slots × CPM/1000</div>
+          <br>
+          <div style="display:flex;gap:16px;justify-content:center;flex-wrap:wrap">
+            <div style="text-align:center"><div style="font-family:var(--font-head);font-size:20px;color:var(--green)" id="estDaily">₹0</div><div style="font-size:11px;color:var(--muted)">Per Day</div></div>
+            <div style="text-align:center"><div style="font-family:var(--font-head);font-size:20px;color:var(--accent)" id="estYearly">₹0</div><div style="font-size:11px;color:var(--muted)">Per Year</div></div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Ad Packages -->
+    <div class="rev-section-title">Choose Your <span>Ad Package</span></div>
+    <div class="rev-section-sub">Flexible plans for every budget — local businesses to national brands.</div>
+    <div class="packages-grid">
+      <div class="pkg-card">
+        <div class="pkg-icon">🌱</div>
+        <div class="pkg-name">Starter</div>
+        <div class="pkg-price"><sup>₹</sup>999</div>
+        <div class="pkg-price-period">per month</div>
+        <ul class="pkg-features">
+          <li class="included"><span class="check">✓</span> Sidebar Banner (250×120)</li>
+          <li class="included"><span class="check">✓</span> 1 ad slot active</li>
+          <li class="included"><span class="check">✓</span> Up to 10,000 impressions/mo</li>
+          <li><span style="color:var(--muted)">—</span> No leaderboard placement</li>
+          <li><span style="color:var(--muted)">—</span> No in-table ads</li>
+          <li><span style="color:var(--muted)">—</span> No analytics dashboard</li>
+        </ul>
+        <button class="pkg-cta outline" onclick="contactAdvertise('Starter')">Get Started</button>
+      </div>
+      <div class="pkg-card featured">
+        <div class="pkg-popular">⭐ Most Popular</div>
+        <div class="pkg-icon">🚀</div>
+        <div class="pkg-name">Growth</div>
+        <div class="pkg-price"><sup>₹</sup>2,499</div>
+        <div class="pkg-price-period">per month</div>
+        <ul class="pkg-features">
+          <li class="included"><span class="check">✓</span> Leaderboard Banner (728×90)</li>
+          <li class="included"><span class="check">✓</span> Sidebar Banner (250×120)</li>
+          <li class="included"><span class="check">✓</span> 2 ad slots active</li>
+          <li class="included"><span class="check">✓</span> Up to 50,000 impressions/mo</li>
+          <li class="included"><span class="check">✓</span> Click tracking report</li>
+          <li><span style="color:var(--muted)">—</span> No in-table ads</li>
+        </ul>
+        <button class="pkg-cta gold-btn" onclick="contactAdvertise('Growth')">Book Now</button>
+      </div>
+      <div class="pkg-card">
+        <div class="pkg-icon">💎</div>
+        <div class="pkg-name">Premium</div>
+        <div class="pkg-price"><sup>₹</sup>5,999</div>
+        <div class="pkg-price-period">per month</div>
+        <ul class="pkg-features">
+          <li class="included"><span class="check">✓</span> All 3 placement types</li>
+          <li class="included"><span class="check">✓</span> In-table native ad</li>
+          <li class="included"><span class="check">✓</span> Unlimited impressions</li>
+          <li class="included"><span class="check">✓</span> Dedicated account manager</li>
+          <li class="included"><span class="check">✓</span> Real-time analytics access</li>
+          <li class="included"><span class="check">✓</span> Custom creative support</li>
+        </ul>
+        <button class="pkg-cta outline" onclick="contactAdvertise('Premium')">Contact Sales</button>
+      </div>
+    </div>
+
+    <!-- Ad Placements Guide -->
+    <div class="rev-section-title">Ad <span>Placement</span> Guide</div>
+    <div class="rev-section-sub">Three distinct zones — each optimised for different goals and budgets.</div>
+    <div class="placements-grid">
+      <div class="placement-card">
+        <div class="placement-top">
+          <div class="placement-icon pi-green">📢</div>
+          <div>
+            <div class="placement-name">Leaderboard Banner</div>
+            <div class="placement-dims">728 × 90 px · Above the fold</div>
+          </div>
+        </div>
+        <div class="placement-desc">The highest-visibility slot on the portal. Displayed above the main content area, seen by every user on every page load. Best for brand awareness campaigns and product launches.</div>
+        <div class="placement-meta">
+          <span class="meta-pill mp-green">Highest CTR</span>
+          <span class="meta-pill mp-gold">Brand Awareness</span>
+          <span class="meta-pill mp-blue">100% Viewability</span>
+        </div>
+      </div>
+      <div class="placement-card">
+        <div class="placement-top">
+          <div class="placement-icon pi-purple">📦</div>
+          <div>
+            <div class="placement-name">Sidebar Banner</div>
+            <div class="placement-dims">250 × 120 px · Sticky left column</div>
+          </div>
+        </div>
+        <div class="placement-desc">Sticky placement in the left sidebar, visible throughout the user's entire session as they type and connect. Ideal for local businesses, service providers, and app promotions.</div>
+        <div class="placement-meta">
+          <span class="meta-pill mp-green">Session-long</span>
+          <span class="meta-pill mp-blue">Local Business</span>
+          <span class="meta-pill mp-gold">Low Cost</span>
+        </div>
+      </div>
+      <div class="placement-card">
+        <div class="placement-top">
+          <div class="placement-icon pi-gold">📋</div>
+          <div>
+            <div class="placement-name">In-Table Native Ad</div>
+            <div class="placement-dims">Full width row · Contacts table</div>
+          </div>
+        </div>
+        <div class="placement-desc">A native-style sponsored row inserted every 5 contacts in the table. Blends naturally with content, extremely low banner-blindness. Perfect for SaaS tools, B2B services, and fintech.</div>
+        <div class="placement-meta">
+          <span class="meta-pill mp-gold">Native Feel</span>
+          <span class="meta-pill mp-green">B2B Targeting</span>
+          <span class="meta-pill mp-blue">High Engagement</span>
+        </div>
+      </div>
+      <div class="placement-card">
+        <div class="placement-top">
+          <div class="placement-icon pi-blue">🎯</div>
+          <div>
+            <div class="placement-name">Sponsored Review</div>
+            <div class="placement-dims">Review card · Reviews tab</div>
+          </div>
+        </div>
+        <div class="placement-desc">A clearly labelled sponsored card in the Reviews section. Shown to users who are actively evaluating the portal — high intent, high trust context. Great for competing products or complementary SaaS tools.</div>
+        <div class="placement-meta">
+          <span class="meta-pill mp-gold">High Intent</span>
+          <span class="meta-pill mp-blue">Trust Context</span>
+          <span class="meta-pill mp-green">SaaS / Apps</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- How it Works -->
+    <div class="rev-section-title">How to <span>Get Started</span></div>
+    <div class="rev-section-sub">From inquiry to live ad in 24–48 hours.</div>
+    <div class="how-grid">
+      <div class="how-step">
+        <div class="how-num">1</div>
+        <div class="how-title">Choose Package</div>
+        <div class="how-desc">Pick Starter, Growth, or Premium based on your budget and goals.</div>
+      </div>
+      <div class="how-step">
+        <div class="how-num">2</div>
+        <div class="how-title">Send Creative</div>
+        <div class="how-desc">Share your banner image, headline, CTA text, and destination URL via WhatsApp or email.</div>
+      </div>
+      <div class="how-step">
+        <div class="how-num">3</div>
+        <div class="how-title">Confirm & Pay</div>
+        <div class="how-desc">Receive proforma invoice. Pay via UPI, NEFT, or Razorpay. Monthly or quarterly billing.</div>
+      </div>
+      <div class="how-step">
+        <div class="how-num">4</div>
+        <div class="how-title">Go Live</div>
+        <div class="how-desc">Your ad goes live within 24 hours. Receive weekly performance reports directly on WhatsApp.</div>
+      </div>
+    </div>
+
+    <!-- CTA Box -->
+    <div class="advertise-cta-box">
+      <h2>Ready to Advertise on <span>WAConnect?</span></h2>
+      <p>Contact our team directly to discuss packages, custom campaigns, or to get a media kit.</p>
+      <div class="cta-row">
+        <button class="wa-cta-btn" onclick="openWAAdvertise()">💬 WhatsApp Us Now</button>
+        <button class="email-cta-btn" onclick="showToast('Email: ads@zalinga.tech — copied!','gold')">📧 ads@zalinga.tech</button>
+      </div>
+    </div>
+
+    <div style="background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);padding:24px;margin-bottom:16px">
+      <div style="font-family:var(--font-head);font-size:15px;font-weight:700;margin-bottom:8px">📋 Advertising Guidelines</div>
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px 28px;font-size:13px;color:var(--muted)">
+        <div>✅ Accepted: Local businesses, SaaS tools, e-commerce, fintech, education</div>
+        <div>✅ Accepted: App promotions, professional services, B2B products</div>
+        <div>❌ Rejected: Adult content, gambling, crypto scams, misleading claims</div>
+        <div>❌ Rejected: Competitor WhatsApp tools with false claims</div>
+        <div>📐 Format: PNG or JPG, max 150KB per creative, sRGB color space</div>
+        <div>🔄 Rotation: Creatives can be swapped once per billing cycle at no cost</div>
       </div>
     </div>
 
   </div>
-</main>
+</div>
 
 <script>
-// ═══════════════════════════════════════
-//  CONFIG
-// ═══════════════════════════════════════
+// ═══ CONFIG ═══
 const CC = '91';
 const STORAGE_KEY = 'wap_contacts_v2';
 const USAGE_KEY   = 'wap_usage_v2';
-let contacts = [];
-let usageLog = [];
-let selectedIds = new Set();
-let searchQuery = '';
+const REVIEWS_KEY = 'wap_reviews_v2';
+let contacts = [], usageLog = [], selectedIds = new Set(), searchQuery = '';
+let selectedStars = 0;
 
-// ═══════════════════════════════════════
-//  TOAST
-// ═══════════════════════════════════════
+// ═══ TOAST ═══
 function showToast(msg, type = 'success', duration = 3000) {
-  const icons = { success: '✅', error: '❌', info: 'ℹ️' };
+  const icons = { success:'✅', error:'❌', info:'ℹ️', gold:'💰' };
   const el = document.createElement('div');
   el.className = `toast ${type}`;
-  el.innerHTML = `<span>${icons[type]}</span><span>${msg}</span>`;
+  el.innerHTML = `<span>${icons[type]||'ℹ️'}</span><span>${msg}</span>`;
   document.getElementById('toastContainer').appendChild(el);
-  setTimeout(() => {
-    el.style.animation = 'slideOut 0.3s ease forwards';
-    setTimeout(() => el.remove(), 300);
-  }, duration);
+  setTimeout(() => { el.style.animation = 'slideOut 0.3s ease forwards'; setTimeout(() => el.remove(), 300); }, duration);
 }
 
-// ═══════════════════════════════════════
-//  THEME
-// ═══════════════════════════════════════
+// ═══ THEME ═══
 (function() {
   const saved = localStorage.getItem('wap_theme') || 'dark';
   document.documentElement.setAttribute('data-theme', saved);
@@ -674,9 +970,17 @@ document.getElementById('themeToggle').addEventListener('click', () => {
   document.getElementById('themeToggle').textContent = next === 'dark' ? '🌙' : '☀️';
 });
 
-// ═══════════════════════════════════════
-//  TAG CHIPS
-// ═══════════════════════════════════════
+// ═══ VIEW SWITCHING ═══
+function switchView(name) {
+  document.querySelectorAll('.view').forEach(v => v.classList.remove('active'));
+  document.getElementById('view' + name.charAt(0).toUpperCase() + name.slice(1)).classList.add('active');
+  document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+  const map = { portal: 0, reviews: 1, advertise: 2 };
+  document.querySelectorAll('.tab-btn')[map[name]]?.classList.add('active');
+  window.scrollTo({ top: 0, behavior: 'smooth' });
+}
+
+// ═══ TAG CHIPS ═══
 document.getElementById('tagRow').addEventListener('click', (e) => {
   const chip = e.target.closest('.tag-chip');
   if (!chip) return;
@@ -685,62 +989,29 @@ document.getElementById('tagRow').addEventListener('click', (e) => {
   document.getElementById('reason').value = chip.dataset.value;
 });
 
-// ═══════════════════════════════════════
-//  CONTACTS DATA
-// ═══════════════════════════════════════
-function loadContacts() {
-  try { contacts = JSON.parse(localStorage.getItem(STORAGE_KEY)) || []; } catch { contacts = []; }
-  renderTable();
-}
-function saveContacts() {
-  localStorage.setItem(STORAGE_KEY, JSON.stringify(contacts));
-  renderTable();
-}
+// ═══ CONTACTS ═══
+function loadContacts() { try { contacts = JSON.parse(localStorage.getItem(STORAGE_KEY)) || []; } catch { contacts = []; } renderTable(); }
+function saveContacts() { localStorage.setItem(STORAGE_KEY, JSON.stringify(contacts)); renderTable(); }
 function addContact(name, rawPhone, reason) {
   const phone = clean(rawPhone);
   if (!name.trim() || !phone) return false;
-  contacts.push({
-    id: Date.now() + Math.random().toString(36).substr(2, 5),
-    name: name.trim(), phone, reason: reason || '',
-    timestamp: new Date().toISOString()
-  });
-  saveContacts();
-  return true;
+  contacts.push({ id: Date.now() + Math.random().toString(36).substr(2, 5), name: name.trim(), phone, reason: reason || '', timestamp: new Date().toISOString() });
+  saveContacts(); return true;
 }
-function deleteContact(id) {
-  contacts = contacts.filter(c => c.id !== id);
-  selectedIds.delete(id);
-  saveContacts();
-  showToast('Contact deleted', 'info');
-}
+function deleteContact(id) { contacts = contacts.filter(c => c.id !== id); selectedIds.delete(id); saveContacts(); showToast('Contact deleted', 'info'); }
 function deleteSelected() {
   const count = selectedIds.size;
   if (!count) return;
   if (!confirm(`Delete ${count} selected contact(s)?`)) return;
-  contacts = contacts.filter(c => !selectedIds.has(c.id));
-  selectedIds.clear();
-  saveContacts();
-  showToast(`${count} contact(s) removed`, 'info');
+  contacts = contacts.filter(c => !selectedIds.has(c.id)); selectedIds.clear(); saveContacts(); showToast(`${count} removed`, 'info');
 }
 window.deleteContact = deleteContact;
 
-// ═══════════════════════════════════════
-//  USAGE
-// ═══════════════════════════════════════
-function loadUsage() {
-  try { usageLog = JSON.parse(localStorage.getItem(USAGE_KEY)) || []; } catch { usageLog = []; }
-  renderAnalytics();
-}
-function saveUsage() {
-  localStorage.setItem(USAGE_KEY, JSON.stringify(usageLog));
-  renderAnalytics();
-}
+// ═══ USAGE ═══
+function loadUsage() { try { usageLog = JSON.parse(localStorage.getItem(USAGE_KEY)) || []; } catch { usageLog = []; } renderAnalytics(); }
+function saveUsage() { localStorage.setItem(USAGE_KEY, JSON.stringify(usageLog)); renderAnalytics(); }
 function logUsage() { usageLog.push(new Date().toISOString()); saveUsage(); }
-function resetAnalytics() {
-  if (!confirm('Reset all usage data?')) return;
-  usageLog = []; saveUsage();
-  showToast('Analytics reset', 'info');
-}
+function resetAnalytics() { if (!confirm('Reset all usage data?')) return; usageLog = []; saveUsage(); showToast('Analytics reset', 'info'); }
 function getAnalytics() {
   const now = new Date();
   const today = now.toISOString().split('T')[0];
@@ -748,32 +1019,18 @@ function getAnalytics() {
   let todayCount = 0, monthCount = 0;
   const dailyMap = {};
   usageLog.forEach(ts => {
-    const d = new Date(ts);
-    const ds = d.toISOString().split('T')[0];
+    const d = new Date(ts); const ds = d.toISOString().split('T')[0];
     if (ds === today) todayCount++;
-    if (d.getFullYear() === cy && d.getMonth() === cm) {
-      monthCount++;
-      dailyMap[ds] = (dailyMap[ds] || 0) + 1;
-    }
+    if (d.getFullYear() === cy && d.getMonth() === cm) { monthCount++; dailyMap[ds] = (dailyMap[ds] || 0) + 1; }
   });
   const daily = Object.entries(dailyMap).sort((a,b) => a[0].localeCompare(b[0])).map(([date,count]) => ({ date, count }));
   return { today: todayCount, month: monthCount, total: usageLog.length, daily };
 }
-
-// ═══════════════════════════════════════
-//  RENDER ANALYTICS
-// ═══════════════════════════════════════
 function animateNumber(el, target) {
   const start = parseInt(el.textContent) || 0;
   if (start === target) return;
-  const dur = 600, step = 16;
-  let cur = start, t = 0;
-  const id = setInterval(() => {
-    t += step;
-    cur = Math.round(start + (target - start) * (t / dur));
-    el.textContent = cur;
-    if (t >= dur) { el.textContent = target; clearInterval(id); }
-  }, step);
+  const dur = 600, step = 16; let cur = start, t = 0;
+  const id = setInterval(() => { t += step; cur = Math.round(start + (target - start) * (t / dur)); el.textContent = cur; if (t >= dur) { el.textContent = target; clearInterval(id); } }, step);
 }
 function renderAnalytics() {
   const s = getAnalytics();
@@ -784,195 +1041,229 @@ function renderAnalytics() {
 }
 function renderBarChart(daily) {
   const bc = document.getElementById('barChart');
-  if (!daily.length) {
-    bc.innerHTML = '<div style="color:var(--muted);font-size:13px;align-self:center">No data yet.</div>';
-    return;
-  }
-  // Last 14 days
+  if (!daily.length) { bc.innerHTML = '<div style="color:var(--muted);font-size:13px;align-self:center">No data yet.</div>'; return; }
   const today = new Date();
-  const days = Array.from({length: 14}, (_, i) => {
-    const d = new Date(today);
-    d.setDate(d.getDate() - (13 - i));
-    return d.toISOString().split('T')[0];
-  });
+  const days = Array.from({length:14}, (_, i) => { const d = new Date(today); d.setDate(d.getDate() - (13 - i)); return d.toISOString().split('T')[0]; });
   const map = Object.fromEntries(daily.map(d => [d.date, d.count]));
   const vals = days.map(d => map[d] || 0);
   const max = Math.max(...vals, 1);
   bc.innerHTML = vals.map((v, i) => {
     const h = Math.round((v / max) * 64) + 4;
     const label = days[i].slice(5).replace('-', '/');
-    return `
-      <div class="bar-col">
-        ${v > 0 ? `<div class="bar-val">${v}</div>` : ''}
-        <div class="bar" style="height:${h}px" title="${days[i]}: ${v} connects"></div>
-        <div class="bar-label">${label}</div>
-      </div>`;
+    return `<div class="bar-col">${v > 0 ? `<div class="bar-val">${v}</div>` : ''}<div class="bar" style="height:${h}px" title="${days[i]}: ${v}"></div><div class="bar-label">${label}</div></div>`;
   }).join('');
 }
 
-// ═══════════════════════════════════════
-//  RENDER TABLE
-// ═══════════════════════════════════════
+// ═══ TABLE ═══
 function timeAgo(ts) {
   const diff = (Date.now() - new Date(ts)) / 1000;
-  if (diff < 60)  return 'just now';
-  if (diff < 3600)  return `${Math.floor(diff/60)}m ago`;
+  if (diff < 60) return 'just now';
+  if (diff < 3600) return `${Math.floor(diff/60)}m ago`;
   if (diff < 86400) return `${Math.floor(diff/3600)}h ago`;
   return `${Math.floor(diff/86400)}d ago`;
 }
 function reasonClass(r) {
   if (r.includes('Document')) return 'doc';
-  if (r.includes('Hi'))       return 'hi';
-  if (r.includes('Test'))     return 'test';
+  if (r.includes('Hi')) return 'hi';
+  if (r.includes('Test')) return 'test';
   return 'other';
 }
 function renderTable() {
   const tbody = document.getElementById('tableBody');
   const empty = document.getElementById('emptyState');
   const bulkBtn = document.getElementById('bulkDelBtn');
-
   let list = contacts;
-  if (searchQuery) {
-    const q = searchQuery.toLowerCase();
-    list = list.filter(c => c.name.toLowerCase().includes(q) || c.phone.includes(q));
-  }
-
+  if (searchQuery) { const q = searchQuery.toLowerCase(); list = list.filter(c => c.name.toLowerCase().includes(q) || c.phone.includes(q)); }
   if (!list.length) {
     tbody.innerHTML = '';
-    empty.style.display = contacts.length ? 'block' : 'block';
-    empty.querySelector('p').innerHTML = contacts.length && searchQuery
-      ? `No contacts match "<strong>${esc(searchQuery)}</strong>"`
-      : 'No contacts saved yet.<br>Connect someone to see them here.';
+    empty.style.display = 'block';
+    empty.querySelector('p').innerHTML = contacts.length && searchQuery ? `No contacts match "<strong>${esc(searchQuery)}</strong>"` : 'No contacts saved yet.<br>Connect someone to see them here.';
   } else {
     empty.style.display = 'none';
-    tbody.innerHTML = list.map(c => {
+    let rows = '';
+    list.forEach((c, i) => {
       const link = `https://wa.me/${CC}${c.phone}`;
-      const rc   = reasonClass(c.reason);
-      const chk  = selectedIds.has(c.id);
-      return `
-        <tr>
-          <td><input type="checkbox" class="row-check" data-id="${c.id}" ${chk ? 'checked' : ''} /></td>
-          <td>
-            <div class="contact-name">${esc(c.name)}</div>
-            <div class="contact-phone">+${CC} ${esc(c.phone)}</div>
-          </td>
-          <td><span class="reason-badge ${rc}">${esc(c.reason || 'Other')}</span></td>
-          <td><span class="time-ago" title="${c.timestamp}">${timeAgo(c.timestamp)}</span></td>
-          <td><a href="${link}" target="_blank" rel="noopener noreferrer" class="action-link">💬 Open</a></td>
-          <td><button class="del-btn" onclick="deleteContact('${c.id}')">✕</button></td>
-        </tr>`;
-    }).join('');
-    // re-bind checkboxes
+      const rc = reasonClass(c.reason);
+      const chk = selectedIds.has(c.id);
+      rows += `<tr><td><input type="checkbox" class="row-check" data-id="${c.id}" ${chk ? 'checked' : ''} /></td><td><div class="contact-name">${esc(c.name)}</div><div class="contact-phone">+${CC} ${esc(c.phone)}</div></td><td><span class="reason-badge ${rc}">${esc(c.reason || 'Other')}</span></td><td><span class="time-ago" title="${c.timestamp}">${timeAgo(c.timestamp)}</span></td><td><a href="${link}" target="_blank" rel="noopener noreferrer" class="action-link">💬 Open</a></td><td><button class="del-btn" onclick="deleteContact('${c.id}')">✕</button></td></tr>`;
+      // Insert in-table ad every 5 rows
+      if ((i + 1) % 5 === 0) {
+        rows += `<tr class="ad-in-table"><td colspan="6"><div class="ad-in-table-content"><div class="ad-in-table-icon">💼</div><div class="ad-in-table-text"><div class="ad-in-table-title">Advertise Your Business Here</div><div class="ad-in-table-sub">Native ad slot · Seen by active users every session</div></div><span class="sponsored-tag">Sponsored</span><button class="ad-in-table-btn" onclick="switchView('advertise')">Book Slot →</button></div></td></tr>`;
+      }
+    });
+    tbody.innerHTML = rows;
     tbody.querySelectorAll('.row-check').forEach(cb => {
-      cb.addEventListener('change', () => {
-        cb.checked ? selectedIds.add(cb.dataset.id) : selectedIds.delete(cb.dataset.id);
-        updateBulkUI();
-      });
+      cb.addEventListener('change', () => { cb.checked ? selectedIds.add(cb.dataset.id) : selectedIds.delete(cb.dataset.id); updateBulkUI(); });
     });
   }
   bulkBtn.style.display = selectedIds.size ? 'block' : 'none';
 }
-function updateBulkUI() {
-  document.getElementById('bulkDelBtn').style.display = selectedIds.size ? 'block' : 'none';
-}
+function updateBulkUI() { document.getElementById('bulkDelBtn').style.display = selectedIds.size ? 'block' : 'none'; }
 document.getElementById('selectAll').addEventListener('change', function() {
-  document.querySelectorAll('.row-check').forEach(cb => {
-    cb.checked = this.checked;
-    this.checked ? selectedIds.add(cb.dataset.id) : selectedIds.delete(cb.dataset.id);
-  });
+  document.querySelectorAll('.row-check').forEach(cb => { cb.checked = this.checked; this.checked ? selectedIds.add(cb.dataset.id) : selectedIds.delete(cb.dataset.id); });
   updateBulkUI();
 });
+document.getElementById('searchInput').addEventListener('input', function() { searchQuery = this.value.trim(); renderTable(); });
 
-// ═══════════════════════════════════════
-//  SEARCH
-// ═══════════════════════════════════════
-document.getElementById('searchInput').addEventListener('input', function() {
-  searchQuery = this.value.trim();
-  renderTable();
-});
-
-// ═══════════════════════════════════════
-//  HELPERS
-// ═══════════════════════════════════════
+// ═══ HELPERS ═══
 function clean(s) { return s.replace(/\D/g, '').replace(/^0+/, ''); }
-function esc(s) {
-  return String(s).replace(/[&<>"']/g, m => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#039;'}[m]));
-}
+function esc(s) { return String(s).replace(/[&<>"']/g, m => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#039;'}[m])); }
 function waLink(phone) { return `https://wa.me/${CC}${phone}`; }
 
-// ═══════════════════════════════════════
-//  MAIN ACTION
-// ═══════════════════════════════════════
+// ═══ MAIN ACTION ═══
 function openAndSave() {
-  const nameEl  = document.getElementById('name');
-  const phoneEl = document.getElementById('phone');
-  const nameErr = document.getElementById('nameError');
-  const phoneErr= document.getElementById('phoneError');
-  const prev    = document.getElementById('linkPreview');
-  const anchor  = document.getElementById('linkAnchor');
-  const reason  = document.getElementById('reason').value;
-
-  nameErr.style.display = phoneErr.style.display = 'none';
-  prev.style.display = 'none';
-
-  const name  = nameEl.value.trim();
-  const phone = clean(phoneEl.value.trim());
-
-  if (!name) {
-    nameErr.textContent = 'Please enter a name.';
-    nameErr.style.display = 'block';
-    nameEl.focus(); return;
-  }
-  if (!phone || phone.length < 7) {
-    phoneErr.textContent = 'Enter a valid phone number.';
-    phoneErr.style.display = 'block';
-    phoneEl.focus(); return;
-  }
-
+  const nameEl = document.getElementById('name'), phoneEl = document.getElementById('phone');
+  const nameErr = document.getElementById('nameError'), phoneErr = document.getElementById('phoneError');
+  const prev = document.getElementById('linkPreview'), anchor = document.getElementById('linkAnchor');
+  const reason = document.getElementById('reason').value;
+  nameErr.style.display = phoneErr.style.display = 'none'; prev.style.display = 'none';
+  const name = nameEl.value.trim(), phone = clean(phoneEl.value.trim());
+  if (!name) { nameErr.textContent = 'Please enter a name.'; nameErr.style.display = 'block'; nameEl.focus(); return; }
+  if (!phone || phone.length < 7) { phoneErr.textContent = 'Enter a valid phone number.'; phoneErr.style.display = 'block'; phoneEl.focus(); return; }
   const link = waLink(phone);
-  anchor.href = link; anchor.textContent = link;
-  prev.style.display = 'block';
+  anchor.href = link; anchor.textContent = link; prev.style.display = 'block';
   window.open(link, '_blank');
-
-  addContact(name, phoneEl.value, reason);
-  logUsage();
+  addContact(name, phoneEl.value, reason); logUsage();
   showToast(`Contact saved: ${name}`, 'success');
-  nameEl.value = ''; phoneEl.value = '';
-  nameEl.focus();
+  nameEl.value = ''; phoneEl.value = ''; nameEl.focus();
 }
 
-// ═══════════════════════════════════════
-//  EXPORT CSV
-// ═══════════════════════════════════════
+// ═══ EXPORT CSV ═══
 function exportCSV() {
   if (!contacts.length) { showToast('No contacts to export', 'error'); return; }
-  const rows = [
-    ['Name','Phone','Reason','WhatsApp Link','Timestamp'],
-    ...contacts.map(c => [c.name, c.phone, c.reason, waLink(c.phone), c.timestamp])
-  ];
+  const rows = [['Name','Phone','Reason','WhatsApp Link','Timestamp'],...contacts.map(c=>[c.name,c.phone,c.reason,waLink(c.phone),c.timestamp])];
   const csv = rows.map(r => r.map(v => `"${v}"`).join(',')).join('\n');
   const url = URL.createObjectURL(new Blob([csv], {type:'text/csv;charset=utf-8;'}));
-  const a = document.createElement('a');
-  a.href = url; a.download = `wa_contacts_${new Date().toISOString().split('T')[0]}.csv`;
-  document.body.appendChild(a); a.click(); document.body.removeChild(a);
-  URL.revokeObjectURL(url);
+  const a = document.createElement('a'); a.href = url; a.download = `wa_contacts_${new Date().toISOString().split('T')[0]}.csv`;
+  document.body.appendChild(a); a.click(); document.body.removeChild(a); URL.revokeObjectURL(url);
   showToast(`Exported ${contacts.length} contacts`, 'success');
 }
 
-// ═══════════════════════════════════════
-//  INIT
-// ═══════════════════════════════════════
+// ═══ REVENUE ESTIMATOR ═══
+function updateEstimator() {
+  const dau = parseInt(document.getElementById('dauSlider').value);
+  const slots = parseInt(document.getElementById('slotSlider').value);
+  const cpm = parseInt(document.getElementById('cpmSlider').value);
+  document.getElementById('dauVal').textContent = dau.toLocaleString('en-IN');
+  document.getElementById('slotVal').textContent = slots;
+  document.getElementById('cpmVal').textContent = '₹' + cpm;
+  const daily = (dau * slots * cpm) / 1000;
+  const monthly = daily * 30;
+  const yearly = monthly * 12;
+  document.getElementById('estDaily').textContent = '₹' + Math.round(daily).toLocaleString('en-IN');
+  document.getElementById('estMonthly').textContent = '₹' + Math.round(monthly).toLocaleString('en-IN');
+  document.getElementById('estYearly').textContent = '₹' + Math.round(yearly).toLocaleString('en-IN');
+}
+['dauSlider','slotSlider','cpmSlider'].forEach(id => document.getElementById(id).addEventListener('input', updateEstimator));
+updateEstimator();
+
+// ═══ ADVERTISE CONTACT ═══
+function contactAdvertise(pkg) {
+  const msg = encodeURIComponent(`Hi! I'm interested in the ${pkg} advertising package on WAConnect Portal by Zalinga Technologies. Please share more details.`);
+  window.open(`https://wa.me/91XXXXXXXXXX?text=${msg}`, '_blank');
+  showToast(`Contacting sales for ${pkg} plan…`, 'gold');
+}
+function openWAAdvertise() {
+  const msg = encodeURIComponent(`Hi Zalinga Technologies! I'd like to advertise on the WAConnect Portal. Please share the media kit and available slots.`);
+  window.open(`https://wa.me/91XXXXXXXXXX?text=${msg}`, '_blank');
+}
+
+// ═══ REVIEWS ═══
+const SEED_REVIEWS = [
+  { id:'r1', name:'Ramesh Gupta', role:'Business Owner', stars:5, text:'WAConnect has completely transformed how I manage customer contacts. Saves me 30 minutes every day. The analytics are a bonus!', date:'2025-03-10', color:'#25D366' },
+  { id:'r2', name:'Priya Malhotra', role:'Freelancer', stars:5, text:'Super clean interface, works perfectly on mobile. I love that everything stays local — no data privacy worries.', date:'2025-03-08', color:'#4f8bff' },
+  { id:'r3', name:'Aditya Sharma', role:'Sales Executive', stars:4, text:'Great tool for my daily sales calls. Would love an option to add notes per contact. Otherwise 10/10 for ease of use.', date:'2025-03-05', color:'#a78bfa' },
+  { id:'r4', name:'Sneha Reddy', role:'Business Owner', stars:5, text:'The CSV export is incredibly useful. I import contacts into my CRM weekly. Zalinga has built something genuinely useful here.', date:'2025-02-28', color:'#f5c842' },
+  { id:'r5', name:'Karan Mehta', role:'Sales Executive', stars:5, text:'I use this 20–30 times a day. The keyboard shortcut ⌘+Enter is a lifesaver. Fast, reliable, no sign-up required.', date:'2025-02-20', color:'#ff4d6d' },
+  { id:'r6', name:'Divya Iyer', role:'Freelancer', stars:3, text:'Decent tool, does the job. I wish there were more reason tags and maybe a folder system. But it\'s free and works!', date:'2025-02-15', color:'#ffaa00' },
+];
+
+function loadReviews() {
+  const saved = JSON.parse(localStorage.getItem(REVIEWS_KEY)) || [];
+  return [...SEED_REVIEWS, ...saved];
+}
+function saveReview(review) {
+  const saved = JSON.parse(localStorage.getItem(REVIEWS_KEY)) || [];
+  saved.push(review);
+  localStorage.setItem(REVIEWS_KEY, JSON.stringify(saved));
+}
+function renderReviews() {
+  const all = loadReviews();
+  const grid = document.getElementById('reviewsGrid');
+  grid.innerHTML = all.map(r => `
+    <div class="review-card" style="animation:fadeIn 0.4s ease both">
+      <div class="review-header">
+        <div class="reviewer-avatar" style="background:${r.color || '#4f8bff'}">${r.name.charAt(0)}</div>
+        <div>
+          <div class="reviewer-name">${esc(r.name)}</div>
+          <div class="reviewer-type">${esc(r.role)}</div>
+        </div>
+        <div class="review-stars">${'★'.repeat(r.stars)}${'☆'.repeat(5-r.stars)}</div>
+      </div>
+      <div class="review-text">"${esc(r.text)}"</div>
+      <div class="review-date">${r.date}</div>
+    </div>`).join('');
+  // Update summary
+  const counts = [0,0,0,0,0];
+  all.forEach(r => counts[r.stars-1]++);
+  const total = all.length;
+  const avg = total ? (all.reduce((a,r)=>a+r.stars,0)/total).toFixed(1) : '0.0';
+  document.getElementById('avgRating').textContent = avg;
+  document.getElementById('totalReviews').textContent = `${total} reviews`;
+  for (let i=1;i<=5;i++) {
+    document.getElementById('r'+i).style.width = total ? (counts[i-1]/total*100)+'%' : '0%';
+    document.getElementById('c'+i).textContent = counts[i-1];
+  }
+  const fullStars = Math.round(parseFloat(avg));
+  document.getElementById('summaryStars').textContent = '★'.repeat(fullStars) + '☆'.repeat(5-fullStars);
+}
+
+// Star picker
+document.getElementById('starPicker').addEventListener('click', e => {
+  const btn = e.target.closest('.star-btn');
+  if (!btn) return;
+  selectedStars = parseInt(btn.dataset.star);
+  document.querySelectorAll('.star-btn').forEach((b,i) => b.classList.toggle('active', i < selectedStars));
+});
+
+document.getElementById('reviewText').addEventListener('input', function() {
+  document.getElementById('charCount').textContent = this.value.length;
+});
+
+document.getElementById('submitReviewBtn').addEventListener('click', () => {
+  const name = document.getElementById('reviewName').value.trim();
+  const role = document.getElementById('reviewRole').value;
+  const text = document.getElementById('reviewText').value.trim();
+  if (!name) { showToast('Please enter your name','error'); return; }
+  if (!selectedStars) { showToast('Please select a star rating','error'); return; }
+  if (text.length < 20) { showToast('Please write at least 20 characters','error'); return; }
+  const colors = ['#25D366','#4f8bff','#a78bfa','#f5c842','#ff4d6d','#ffaa00'];
+  const review = {
+    id: 'u' + Date.now(),
+    name, role, stars: selectedStars, text,
+    date: new Date().toISOString().split('T')[0],
+    color: colors[Math.floor(Math.random()*colors.length)]
+  };
+  saveReview(review);
+  renderReviews();
+  document.getElementById('reviewName').value = '';
+  document.getElementById('reviewText').value = '';
+  document.getElementById('charCount').textContent = '0';
+  document.querySelectorAll('.star-btn').forEach(b => b.classList.remove('active'));
+  selectedStars = 0;
+  showToast('Review submitted! Thank you ⭐','success');
+  window.scrollTo({ top: 0, behavior: 'smooth' });
+});
+
+// ═══ INIT ═══
 window.addEventListener('DOMContentLoaded', () => {
-  loadContacts(); loadUsage();
+  loadContacts(); loadUsage(); renderReviews();
   document.getElementById('whatsappBtn').addEventListener('click', openAndSave);
   document.getElementById('exportBtn').addEventListener('click', exportCSV);
   document.getElementById('resetBtn').addEventListener('click', resetAnalytics);
   document.getElementById('bulkDelBtn').addEventListener('click', deleteSelected);
-
   [document.getElementById('name'), document.getElementById('phone')].forEach(inp => {
-    inp.addEventListener('keydown', e => {
-      if ((e.metaKey || e.ctrlKey) && e.key === 'Enter') { e.preventDefault(); openAndSave(); }
-    });
+    inp.addEventListener('keydown', e => { if ((e.metaKey || e.ctrlKey) && e.key === 'Enter') { e.preventDefault(); openAndSave(); } });
   });
 });
 </script>
