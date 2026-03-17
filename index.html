@@ -1,0 +1,980 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="dark">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>WhatsApp Portal — Zalinga Technologies</title>
+  <link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;600;700;800&family=DM+Sans:ital,wght@0,300;0,400;0,500;1,300&display=swap" rel="stylesheet" />
+  <style>
+    /* ─── TOKENS ─────────────────────────────────────────── */
+    :root {
+      --bg:        #0b0f1a;
+      --surface:   #111827;
+      --surface2:  #1a2236;
+      --border:    rgba(255,255,255,0.08);
+      --border-hi: rgba(37,211,102,0.35);
+      --text:      #f0f4ff;
+      --muted:     #6b7a99;
+      --green:     #25D366;
+      --green-glow:rgba(37,211,102,0.25);
+      --green-dark:#178a42;
+      --accent:    #4f8bff;
+      --danger:    #ff4d6d;
+      --warn:      #ffaa00;
+      --radius:    16px;
+      --radius-sm: 10px;
+      --shadow:    0 8px 40px rgba(0,0,0,0.5);
+      --font-head: 'Syne', sans-serif;
+      --font-body: 'DM Sans', sans-serif;
+      --transition: 0.22s cubic-bezier(0.4,0,0.2,1);
+    }
+    [data-theme="light"] {
+      --bg:       #f0f4ff;
+      --surface:  #ffffff;
+      --surface2: #eef2fb;
+      --border:   rgba(0,0,0,0.08);
+      --border-hi:rgba(37,211,102,0.4);
+      --text:     #111827;
+      --muted:    #6b7a99;
+      --shadow:   0 8px 40px rgba(0,0,0,0.1);
+    }
+
+    /* ─── RESET ──────────────────────────────────────────── */
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    html { scroll-behavior: smooth; }
+    body {
+      background: var(--bg);
+      color: var(--text);
+      font-family: var(--font-body);
+      font-size: 15px;
+      line-height: 1.6;
+      min-height: 100vh;
+      transition: background var(--transition), color var(--transition);
+    }
+
+    /* ─── SCROLLBAR ──────────────────────────────────────── */
+    ::-webkit-scrollbar { width: 6px; }
+    ::-webkit-scrollbar-track { background: var(--bg); }
+    ::-webkit-scrollbar-thumb { background: var(--surface2); border-radius: 4px; }
+
+    /* ─── TOAST ──────────────────────────────────────────── */
+    #toastContainer {
+      position: fixed; top: 24px; right: 24px;
+      z-index: 9999; display: flex; flex-direction: column; gap: 10px;
+    }
+    .toast {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      color: var(--text);
+      padding: 14px 20px;
+      border-radius: var(--radius-sm);
+      font-family: var(--font-body);
+      font-size: 14px;
+      display: flex; align-items: center; gap: 10px;
+      box-shadow: var(--shadow);
+      animation: slideIn 0.3s ease forwards;
+      max-width: 320px;
+    }
+    .toast.success { border-left: 3px solid var(--green); }
+    .toast.error   { border-left: 3px solid var(--danger); }
+    .toast.info    { border-left: 3px solid var(--accent); }
+    @keyframes slideIn {
+      from { transform: translateX(120%); opacity: 0; }
+      to   { transform: translateX(0);   opacity: 1; }
+    }
+    @keyframes slideOut {
+      from { transform: translateX(0);   opacity: 1; }
+      to   { transform: translateX(120%); opacity: 0; }
+    }
+
+    /* ─── TOP BAR ────────────────────────────────────────── */
+    .topbar {
+      position: sticky; top: 0; z-index: 100;
+      background: rgba(11,15,26,0.8);
+      backdrop-filter: blur(20px);
+      -webkit-backdrop-filter: blur(20px);
+      border-bottom: 1px solid var(--border);
+      padding: 0 32px;
+      height: 64px;
+      display: flex; align-items: center; justify-content: space-between;
+      transition: background var(--transition);
+    }
+    [data-theme="light"] .topbar { background: rgba(240,244,255,0.85); }
+    .topbar-brand {
+      display: flex; align-items: center; gap: 12px;
+    }
+    .topbar-logo {
+      width: 36px; height: 36px; border-radius: 10px;
+      background: linear-gradient(135deg, var(--green), var(--green-dark));
+      display: flex; align-items: center; justify-content: center;
+      font-size: 18px;
+      box-shadow: 0 0 16px var(--green-glow);
+    }
+    .topbar-title {
+      font-family: var(--font-head);
+      font-weight: 800;
+      font-size: 18px;
+      letter-spacing: -0.3px;
+    }
+    .topbar-title span { color: var(--green); }
+    .topbar-sub {
+      font-size: 11px;
+      color: var(--muted);
+      letter-spacing: 1.5px;
+      text-transform: uppercase;
+    }
+    .topbar-actions { display: flex; align-items: center; gap: 12px; }
+    .theme-toggle {
+      width: 40px; height: 40px; border-radius: 12px;
+      background: var(--surface2); border: 1px solid var(--border);
+      cursor: pointer; display: flex; align-items: center; justify-content: center;
+      font-size: 18px; transition: all var(--transition);
+      color: var(--text);
+    }
+    .theme-toggle:hover { background: var(--surface); border-color: var(--border-hi); }
+    .shortcut-hint {
+      font-size: 11px; color: var(--muted);
+      background: var(--surface2); border: 1px solid var(--border);
+      border-radius: 6px; padding: 4px 8px; letter-spacing: 0.5px;
+    }
+    @media (max-width: 640px) { .shortcut-hint { display: none; } }
+
+    /* ─── LAYOUT ─────────────────────────────────────────── */
+    .page {
+      max-width: 1100px; margin: 0 auto;
+      padding: 40px 24px 80px;
+      display: grid;
+      grid-template-columns: 420px 1fr;
+      gap: 28px;
+      align-items: start;
+    }
+    @media (max-width: 900px) {
+      .page { grid-template-columns: 1fr; }
+    }
+    .left-col { position: sticky; top: 88px; }
+
+    /* ─── CARD ───────────────────────────────────────────── */
+    .card {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      padding: 28px;
+      box-shadow: var(--shadow);
+      transition: background var(--transition), border var(--transition);
+    }
+    .card + .card { margin-top: 0; }
+
+    /* ─── HERO HEADER ────────────────────────────────────── */
+    .hero-header {
+      text-align: center;
+      padding-bottom: 28px;
+      border-bottom: 1px solid var(--border);
+      margin-bottom: 28px;
+    }
+    .hero-icon {
+      width: 72px; height: 72px; border-radius: 22px; margin: 0 auto 16px;
+      background: linear-gradient(135deg, var(--green), var(--green-dark));
+      display: flex; align-items: center; justify-content: center;
+      font-size: 36px;
+      box-shadow: 0 0 36px var(--green-glow), 0 0 72px rgba(37,211,102,0.1);
+      animation: pulse 3s ease-in-out infinite;
+    }
+    @keyframes pulse {
+      0%,100% { box-shadow: 0 0 36px var(--green-glow), 0 0 72px rgba(37,211,102,0.1); }
+      50%      { box-shadow: 0 0 48px rgba(37,211,102,0.5), 0 0 96px rgba(37,211,102,0.15); }
+    }
+    .hero-title {
+      font-family: var(--font-head);
+      font-size: 26px; font-weight: 800; letter-spacing: -0.5px;
+      margin-bottom: 4px;
+    }
+    .hero-title span { color: var(--green); }
+    .hero-sub { color: var(--muted); font-size: 13px; }
+
+    /* ─── FORM ───────────────────────────────────────────── */
+    .field { margin-bottom: 18px; }
+    .field label {
+      display: block; margin-bottom: 8px;
+      font-size: 12px; font-weight: 500;
+      color: var(--muted); text-transform: uppercase; letter-spacing: 1px;
+    }
+    .input-wrap { position: relative; }
+    .input-wrap .icon {
+      position: absolute; left: 14px; top: 50%; transform: translateY(-50%);
+      font-size: 16px; pointer-events: none;
+    }
+    .field input, .field select {
+      width: 100%; padding: 13px 14px 13px 42px;
+      background: var(--surface2);
+      border: 1px solid var(--border);
+      border-radius: var(--radius-sm);
+      color: var(--text);
+      font-family: var(--font-body); font-size: 15px;
+      transition: all var(--transition);
+      appearance: none;
+    }
+    .field select {
+      background-image: url("data:image/svg+xml;charset=UTF-8,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%236b7a99' stroke-width='2'%3e%3cpolyline points='6 9 12 15 18 9'%3e%3c/polyline%3e%3c/svg%3e");
+      background-repeat: no-repeat; background-position: right 14px center; background-size: 14px;
+      padding-right: 36px;
+    }
+    .field input:focus, .field select:focus {
+      outline: none;
+      border-color: var(--green);
+      background: var(--surface2);
+      box-shadow: 0 0 0 3px var(--green-glow);
+    }
+    .field input::placeholder { color: var(--muted); }
+    .phone-badge {
+      display: inline-flex; align-items: center; gap: 6px;
+      margin-top: 8px; padding: 5px 10px;
+      background: rgba(37,211,102,0.08);
+      border: 1px solid rgba(37,211,102,0.2);
+      border-radius: 6px; font-size: 12px; color: var(--green);
+    }
+    .field-error {
+      color: var(--danger); font-size: 12px; margin-top: 6px; display: none;
+    }
+
+    /* ─── REASON TAGS ────────────────────────────────────── */
+    .tag-row {
+      display: flex; flex-wrap: wrap; gap: 8px; margin-bottom: 4px;
+    }
+    .tag-chip {
+      padding: 7px 14px;
+      border-radius: 50px;
+      font-size: 13px; font-weight: 500;
+      cursor: pointer; border: 1px solid var(--border);
+      background: var(--surface2); color: var(--muted);
+      transition: all var(--transition); user-select: none;
+    }
+    .tag-chip:hover { border-color: var(--green); color: var(--text); }
+    .tag-chip.active {
+      background: var(--green); color: #fff; border-color: var(--green);
+      box-shadow: 0 0 12px var(--green-glow);
+    }
+    .tag-chip.doc  { --chip-color: #4f8bff; }
+    .tag-chip.hi   { --chip-color: var(--green); }
+    .tag-chip.test { --chip-color: var(--warn); }
+    .tag-chip.other{ --chip-color: #a78bfa; }
+    .tag-chip.active { background: var(--chip-color, var(--green)); border-color: var(--chip-color, var(--green)); }
+
+    /* ─── CTA BUTTON ─────────────────────────────────────── */
+    .cta-btn {
+      width: 100%; padding: 16px;
+      background: linear-gradient(135deg, var(--green), var(--green-dark));
+      color: #fff; border: none;
+      border-radius: var(--radius-sm);
+      font-family: var(--font-head); font-size: 17px; font-weight: 700;
+      cursor: pointer; letter-spacing: 0.3px;
+      display: flex; align-items: center; justify-content: center; gap: 10px;
+      box-shadow: 0 4px 24px var(--green-glow);
+      transition: all var(--transition); margin-top: 8px;
+    }
+    .cta-btn:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 8px 32px rgba(37,211,102,0.4);
+    }
+    .cta-btn:active { transform: scale(0.98); }
+
+    .link-preview {
+      margin-top: 16px; padding: 12px 16px;
+      background: rgba(37,211,102,0.06);
+      border: 1px solid rgba(37,211,102,0.2);
+      border-radius: var(--radius-sm);
+      font-size: 13px; word-break: break-all; display: none;
+    }
+    .link-preview a { color: var(--green); text-decoration: none; }
+    .link-preview a:hover { text-decoration: underline; }
+
+    /* ─── PLAY BANNER ────────────────────────────────────── */
+    .play-banner {
+      margin-top: 24px; padding: 16px 20px;
+      background: var(--surface2);
+      border: 1px solid var(--border);
+      border-radius: var(--radius-sm);
+      display: flex; align-items: center; justify-content: space-between; gap: 12px;
+    }
+    .play-banner-text h4 {
+      font-family: var(--font-head); font-size: 14px; font-weight: 700;
+      margin-bottom: 2px;
+    }
+    .play-banner-text p { font-size: 12px; color: var(--muted); }
+    .play-pill {
+      padding: 8px 16px; border-radius: 50px;
+      background: var(--text); color: var(--bg);
+      font-size: 13px; font-weight: 600; text-decoration: none;
+      white-space: nowrap; transition: opacity var(--transition);
+    }
+    .play-pill:hover { opacity: 0.85; }
+
+    /* ─── RIGHT COL ──────────────────────────────────────── */
+    .right-col { display: flex; flex-direction: column; gap: 28px; }
+
+    /* ─── STATS GRID ─────────────────────────────────────── */
+    .section-header {
+      display: flex; align-items: center; justify-content: space-between;
+      margin-bottom: 20px;
+    }
+    .section-title {
+      font-family: var(--font-head); font-size: 18px; font-weight: 700;
+    }
+    .section-title span { color: var(--green); }
+    .btn-sm {
+      padding: 7px 16px; border-radius: 50px;
+      font-family: var(--font-body); font-size: 13px; font-weight: 500;
+      cursor: pointer; border: 1px solid var(--border);
+      background: var(--surface2); color: var(--text);
+      transition: all var(--transition);
+    }
+    .btn-sm:hover { border-color: var(--green); color: var(--green); }
+    .btn-sm.danger:hover { border-color: var(--danger); color: var(--danger); }
+
+    .stats-grid {
+      display: grid; grid-template-columns: repeat(3, 1fr); gap: 16px;
+      margin-bottom: 24px;
+    }
+    @media (max-width: 640px) { .stats-grid { grid-template-columns: 1fr 1fr; } }
+    .stat-card {
+      background: var(--surface2); border: 1px solid var(--border);
+      border-radius: var(--radius-sm); padding: 20px;
+      text-align: center; position: relative; overflow: hidden;
+      transition: border var(--transition);
+    }
+    .stat-card::before {
+      content: ''; position: absolute; inset: 0;
+      background: linear-gradient(135deg, rgba(37,211,102,0.04), transparent);
+    }
+    .stat-card:hover { border-color: var(--border-hi); }
+    .stat-label {
+      font-size: 11px; color: var(--muted); text-transform: uppercase;
+      letter-spacing: 1px; margin-bottom: 10px;
+    }
+    .stat-number {
+      font-family: var(--font-head); font-size: 38px; font-weight: 800;
+      color: var(--green); line-height: 1;
+      text-shadow: 0 0 20px var(--green-glow);
+      transition: all 0.5s cubic-bezier(0.4,0,0.2,1);
+    }
+    .stat-card:nth-child(2) .stat-number { color: var(--accent); text-shadow: 0 0 20px rgba(79,139,255,0.3); }
+    .stat-card:nth-child(3) .stat-number { color: #a78bfa; text-shadow: 0 0 20px rgba(167,139,250,0.3); }
+
+    /* ─── MINI CHART ─────────────────────────────────────── */
+    .chart-wrap { margin-top: 8px; }
+    .chart-title {
+      font-size: 13px; color: var(--muted); margin-bottom: 12px;
+      font-weight: 500;
+    }
+    .bar-chart {
+      display: flex; align-items: flex-end;
+      gap: 5px; height: 80px;
+    }
+    .bar-col {
+      flex: 1; display: flex; flex-direction: column;
+      align-items: center; gap: 4px; height: 100%; justify-content: flex-end;
+    }
+    .bar {
+      width: 100%; border-radius: 4px 4px 0 0;
+      background: linear-gradient(to top, var(--green-dark), var(--green));
+      transition: height 0.6s cubic-bezier(0.4,0,0.2,1);
+      min-height: 4px; position: relative; cursor: pointer;
+    }
+    .bar:hover { filter: brightness(1.2); }
+    .bar-label {
+      font-size: 9px; color: var(--muted); white-space: nowrap;
+    }
+    .bar-val {
+      font-size: 10px; font-weight: 600; color: var(--green);
+      margin-bottom: 2px;
+    }
+
+    /* ─── CONTACTS TABLE ─────────────────────────────────── */
+    .search-row {
+      display: flex; gap: 10px; margin-bottom: 16px;
+    }
+    .search-wrap { flex: 1; position: relative; }
+    .search-wrap .icon { position: absolute; left: 12px; top: 50%; transform: translateY(-50%); font-size: 15px; }
+    .search-input {
+      width: 100%; padding: 10px 12px 10px 36px;
+      background: var(--surface2); border: 1px solid var(--border);
+      border-radius: var(--radius-sm); color: var(--text);
+      font-family: var(--font-body); font-size: 14px;
+      transition: all var(--transition);
+    }
+    .search-input:focus { outline: none; border-color: var(--green); box-shadow: 0 0 0 3px var(--green-glow); }
+    .search-input::placeholder { color: var(--muted); }
+    .bulk-del-btn {
+      padding: 10px 16px; border-radius: var(--radius-sm);
+      background: rgba(255,77,109,0.1); border: 1px solid rgba(255,77,109,0.25);
+      color: var(--danger); font-size: 13px; cursor: pointer;
+      transition: all var(--transition); white-space: nowrap;
+    }
+    .bulk-del-btn:hover { background: rgba(255,77,109,0.2); }
+
+    .table-wrap { overflow-x: auto; }
+    table { width: 100%; border-collapse: collapse; font-size: 14px; }
+    thead th {
+      padding: 10px 12px; text-align: left;
+      font-size: 11px; color: var(--muted); text-transform: uppercase; letter-spacing: 1px;
+      border-bottom: 1px solid var(--border); white-space: nowrap;
+    }
+    thead th input[type="checkbox"] { cursor: pointer; accent-color: var(--green); }
+    tbody tr { transition: background var(--transition); }
+    tbody tr:hover { background: rgba(255,255,255,0.03); }
+    tbody td { padding: 12px; border-bottom: 1px solid var(--border); vertical-align: middle; }
+    .contact-name { font-weight: 500; }
+    .contact-phone { color: var(--muted); font-size: 13px; }
+    .reason-badge {
+      padding: 3px 10px; border-radius: 50px; font-size: 12px; font-weight: 500;
+    }
+    .reason-badge.doc  { background: rgba(79,139,255,0.12); color: #4f8bff; }
+    .reason-badge.hi   { background: rgba(37,211,102,0.1);  color: var(--green); }
+    .reason-badge.test { background: rgba(255,170,0,0.1);   color: var(--warn); }
+    .reason-badge.other{ background: rgba(167,139,250,0.1); color: #a78bfa; }
+    .time-ago { font-size: 12px; color: var(--muted); white-space: nowrap; }
+    .action-link {
+      display: inline-flex; align-items: center; gap: 5px;
+      padding: 5px 12px; border-radius: 50px; font-size: 12px; font-weight: 500;
+      background: rgba(37,211,102,0.1); color: var(--green);
+      text-decoration: none; border: 1px solid rgba(37,211,102,0.2);
+      transition: all var(--transition); white-space: nowrap;
+    }
+    .action-link:hover { background: rgba(37,211,102,0.2); }
+    .del-btn {
+      padding: 5px 10px; border-radius: 50px; font-size: 12px;
+      background: transparent; border: 1px solid rgba(255,77,109,0.3);
+      color: var(--danger); cursor: pointer; transition: all var(--transition);
+    }
+    .del-btn:hover { background: rgba(255,77,109,0.12); }
+
+    .empty-state {
+      text-align: center; padding: 48px 20px;
+    }
+    .empty-state .empty-icon { font-size: 48px; margin-bottom: 12px; opacity: 0.4; }
+    .empty-state p { color: var(--muted); font-size: 14px; }
+
+    /* ─── FOOTER ─────────────────────────────────────────── */
+    .footer-note {
+      text-align: center; margin-top: 16px;
+      font-size: 12px; color: var(--muted);
+    }
+    .footer-note span { color: var(--green); font-weight: 600; }
+
+    /* ─── FADE IN ────────────────────────────────────────── */
+    .fade-in {
+      animation: fadeIn 0.5s ease forwards;
+    }
+    @keyframes fadeIn { from { opacity: 0; transform: translateY(12px); } to { opacity: 1; transform: none; } }
+    .card { animation: fadeIn 0.5s ease both; }
+    .right-col .card:nth-child(1) { animation-delay: 0.05s; }
+    .right-col .card:nth-child(2) { animation-delay: 0.1s; }
+  </style>
+</head>
+<body>
+
+<!-- TOAST CONTAINER -->
+<div id="toastContainer"></div>
+
+<!-- TOP BAR -->
+<header class="topbar">
+  <div class="topbar-brand">
+    <div class="topbar-logo">📱</div>
+    <div>
+      <div class="topbar-title">WA<span>Connect</span></div>
+      <div class="topbar-sub">Zalinga Technologies</div>
+    </div>
+  </div>
+  <div class="topbar-actions">
+    <span class="shortcut-hint">⌘ + Enter to send</span>
+    <button class="theme-toggle" id="themeToggle" title="Toggle theme">🌙</button>
+  </div>
+</header>
+
+<!-- PAGE -->
+<main class="page">
+
+  <!-- ── LEFT: INPUT CARD ── -->
+  <aside class="left-col">
+    <div class="card">
+      <div class="hero-header">
+        <div class="hero-icon">💬</div>
+        <div class="hero-title">WhatsApp <span>Connect</span></div>
+        <div class="hero-sub">Enter details and open instantly</div>
+        <div class="hero-sub">Data stored locally in your browser</div>
+      </div>
+
+      <!-- Name -->
+      <div class="field">
+        <label>Full Name</label>
+        <div class="input-wrap">
+          <span class="icon">👤</span>
+          <input type="text" id="name" placeholder="e.g. Rahul Sharma" autocomplete="off" />
+        </div>
+        <div id="nameError" class="field-error"></div>
+      </div>
+
+      <!-- Phone -->
+      <div class="field">
+        <label>Phone Number</label>
+        <div class="input-wrap">
+          <span class="icon">📞</span>
+          <input type="tel" id="phone" placeholder="e.g. 9876543210" autocomplete="off" />
+        </div>
+        <div class="phone-badge">🇮🇳 +91 added automatically</div>
+        <div id="phoneError" class="field-error"></div>
+      </div>
+
+      <!-- Reason -->
+      <div class="field">
+        <label>Reason for Connect</label>
+        <div class="tag-row" id="tagRow">
+          <div class="tag-chip doc  active" data-value="Send Document &amp; Photo">📎 Document</div>
+          <div class="tag-chip hi"           data-value="Send Hi Hello">👋 Hi Hello</div>
+          <div class="tag-chip test"         data-value="Testing">🧪 Testing</div>
+          <div class="tag-chip other"        data-value="Other">💬 Other</div>
+        </div>
+        <input type="hidden" id="reason" value="Send Document &amp; Photo" />
+      </div>
+
+      <!-- CTA -->
+      <button class="cta-btn" id="whatsappBtn">
+        <span>💬</span> Open WhatsApp & Save
+      </button>
+
+      <div id="linkPreview" class="link-preview">
+        🔗 <a id="linkAnchor" href="#" target="_blank" rel="noopener noreferrer"></a>
+        &nbsp;<small style="color:var(--muted)">(click if not redirected)</small>
+      </div>
+
+      <!-- Play Banner -->
+      <div class="play-banner">
+        <div class="play-banner-text">
+          <h4>🚀 Official App</h4>
+          <p>Faster experience on Google Play</p>
+        </div>
+        <a href="#" class="play-pill" onclick="showToast('Opening Google Play…','info'); return false;">📲 Get App</a>
+      </div>
+
+      <div class="footer-note">Powered by · <span>Zalinga Technologies</span></div>
+    </div>
+  </aside>
+
+  <!-- ── RIGHT: ANALYTICS + CONTACTS ── -->
+  <div class="right-col">
+
+    <!-- Analytics -->
+    <div class="card">
+      <div class="section-header">
+        <div class="section-title">📊 <span>Analytics</span></div>
+        <button class="btn-sm danger" id="resetBtn">Reset</button>
+      </div>
+
+      <div class="stats-grid">
+        <div class="stat-card">
+          <div class="stat-label">Today</div>
+          <div class="stat-number" id="todayCount">0</div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-label">This Month</div>
+          <div class="stat-number" id="monthCount">0</div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-label">All Time</div>
+          <div class="stat-number" id="totalCount">0</div>
+        </div>
+      </div>
+
+      <div class="chart-wrap">
+        <div class="chart-title">Daily connections — last 14 days</div>
+        <div class="bar-chart" id="barChart">
+          <div style="color:var(--muted);font-size:13px;padding:8px">No data yet.</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Contacts -->
+    <div class="card">
+      <div class="section-header">
+        <div class="section-title">📋 <span>Contacts</span></div>
+        <button class="btn-sm" id="exportBtn">⬇ Export CSV</button>
+      </div>
+
+      <div class="search-row">
+        <div class="search-wrap">
+          <span class="icon">🔍</span>
+          <input type="text" id="searchInput" class="search-input" placeholder="Search name or phone…" />
+        </div>
+        <button class="bulk-del-btn" id="bulkDelBtn" style="display:none">🗑 Delete Selected</button>
+      </div>
+
+      <div class="table-wrap">
+        <table id="contactsTable">
+          <thead>
+            <tr>
+              <th><input type="checkbox" id="selectAll" /></th>
+              <th>Contact</th>
+              <th>Reason</th>
+              <th>When</th>
+              <th>Link</th>
+              <th></th>
+            </tr>
+          </thead>
+          <tbody id="tableBody"></tbody>
+        </table>
+      </div>
+      <div id="emptyState" class="empty-state" style="display:none">
+        <div class="empty-icon">📭</div>
+        <p>No contacts saved yet.<br>Connect someone to see them here.</p>
+      </div>
+    </div>
+
+  </div>
+</main>
+
+<script>
+// ═══════════════════════════════════════
+//  CONFIG
+// ═══════════════════════════════════════
+const CC = '91';
+const STORAGE_KEY = 'wap_contacts_v2';
+const USAGE_KEY   = 'wap_usage_v2';
+let contacts = [];
+let usageLog = [];
+let selectedIds = new Set();
+let searchQuery = '';
+
+// ═══════════════════════════════════════
+//  TOAST
+// ═══════════════════════════════════════
+function showToast(msg, type = 'success', duration = 3000) {
+  const icons = { success: '✅', error: '❌', info: 'ℹ️' };
+  const el = document.createElement('div');
+  el.className = `toast ${type}`;
+  el.innerHTML = `<span>${icons[type]}</span><span>${msg}</span>`;
+  document.getElementById('toastContainer').appendChild(el);
+  setTimeout(() => {
+    el.style.animation = 'slideOut 0.3s ease forwards';
+    setTimeout(() => el.remove(), 300);
+  }, duration);
+}
+
+// ═══════════════════════════════════════
+//  THEME
+// ═══════════════════════════════════════
+(function() {
+  const saved = localStorage.getItem('wap_theme') || 'dark';
+  document.documentElement.setAttribute('data-theme', saved);
+  document.getElementById('themeToggle').textContent = saved === 'dark' ? '🌙' : '☀️';
+})();
+document.getElementById('themeToggle').addEventListener('click', () => {
+  const curr = document.documentElement.getAttribute('data-theme');
+  const next = curr === 'dark' ? 'light' : 'dark';
+  document.documentElement.setAttribute('data-theme', next);
+  localStorage.setItem('wap_theme', next);
+  document.getElementById('themeToggle').textContent = next === 'dark' ? '🌙' : '☀️';
+});
+
+// ═══════════════════════════════════════
+//  TAG CHIPS
+// ═══════════════════════════════════════
+document.getElementById('tagRow').addEventListener('click', (e) => {
+  const chip = e.target.closest('.tag-chip');
+  if (!chip) return;
+  document.querySelectorAll('.tag-chip').forEach(c => c.classList.remove('active'));
+  chip.classList.add('active');
+  document.getElementById('reason').value = chip.dataset.value;
+});
+
+// ═══════════════════════════════════════
+//  CONTACTS DATA
+// ═══════════════════════════════════════
+function loadContacts() {
+  try { contacts = JSON.parse(localStorage.getItem(STORAGE_KEY)) || []; } catch { contacts = []; }
+  renderTable();
+}
+function saveContacts() {
+  localStorage.setItem(STORAGE_KEY, JSON.stringify(contacts));
+  renderTable();
+}
+function addContact(name, rawPhone, reason) {
+  const phone = clean(rawPhone);
+  if (!name.trim() || !phone) return false;
+  contacts.push({
+    id: Date.now() + Math.random().toString(36).substr(2, 5),
+    name: name.trim(), phone, reason: reason || '',
+    timestamp: new Date().toISOString()
+  });
+  saveContacts();
+  return true;
+}
+function deleteContact(id) {
+  contacts = contacts.filter(c => c.id !== id);
+  selectedIds.delete(id);
+  saveContacts();
+  showToast('Contact deleted', 'info');
+}
+function deleteSelected() {
+  const count = selectedIds.size;
+  if (!count) return;
+  if (!confirm(`Delete ${count} selected contact(s)?`)) return;
+  contacts = contacts.filter(c => !selectedIds.has(c.id));
+  selectedIds.clear();
+  saveContacts();
+  showToast(`${count} contact(s) removed`, 'info');
+}
+window.deleteContact = deleteContact;
+
+// ═══════════════════════════════════════
+//  USAGE
+// ═══════════════════════════════════════
+function loadUsage() {
+  try { usageLog = JSON.parse(localStorage.getItem(USAGE_KEY)) || []; } catch { usageLog = []; }
+  renderAnalytics();
+}
+function saveUsage() {
+  localStorage.setItem(USAGE_KEY, JSON.stringify(usageLog));
+  renderAnalytics();
+}
+function logUsage() { usageLog.push(new Date().toISOString()); saveUsage(); }
+function resetAnalytics() {
+  if (!confirm('Reset all usage data?')) return;
+  usageLog = []; saveUsage();
+  showToast('Analytics reset', 'info');
+}
+function getAnalytics() {
+  const now = new Date();
+  const today = now.toISOString().split('T')[0];
+  const cm = now.getMonth(), cy = now.getFullYear();
+  let todayCount = 0, monthCount = 0;
+  const dailyMap = {};
+  usageLog.forEach(ts => {
+    const d = new Date(ts);
+    const ds = d.toISOString().split('T')[0];
+    if (ds === today) todayCount++;
+    if (d.getFullYear() === cy && d.getMonth() === cm) {
+      monthCount++;
+      dailyMap[ds] = (dailyMap[ds] || 0) + 1;
+    }
+  });
+  const daily = Object.entries(dailyMap).sort((a,b) => a[0].localeCompare(b[0])).map(([date,count]) => ({ date, count }));
+  return { today: todayCount, month: monthCount, total: usageLog.length, daily };
+}
+
+// ═══════════════════════════════════════
+//  RENDER ANALYTICS
+// ═══════════════════════════════════════
+function animateNumber(el, target) {
+  const start = parseInt(el.textContent) || 0;
+  if (start === target) return;
+  const dur = 600, step = 16;
+  let cur = start, t = 0;
+  const id = setInterval(() => {
+    t += step;
+    cur = Math.round(start + (target - start) * (t / dur));
+    el.textContent = cur;
+    if (t >= dur) { el.textContent = target; clearInterval(id); }
+  }, step);
+}
+function renderAnalytics() {
+  const s = getAnalytics();
+  animateNumber(document.getElementById('todayCount'), s.today);
+  animateNumber(document.getElementById('monthCount'), s.month);
+  animateNumber(document.getElementById('totalCount'), s.total);
+  renderBarChart(s.daily);
+}
+function renderBarChart(daily) {
+  const bc = document.getElementById('barChart');
+  if (!daily.length) {
+    bc.innerHTML = '<div style="color:var(--muted);font-size:13px;align-self:center">No data yet.</div>';
+    return;
+  }
+  // Last 14 days
+  const today = new Date();
+  const days = Array.from({length: 14}, (_, i) => {
+    const d = new Date(today);
+    d.setDate(d.getDate() - (13 - i));
+    return d.toISOString().split('T')[0];
+  });
+  const map = Object.fromEntries(daily.map(d => [d.date, d.count]));
+  const vals = days.map(d => map[d] || 0);
+  const max = Math.max(...vals, 1);
+  bc.innerHTML = vals.map((v, i) => {
+    const h = Math.round((v / max) * 64) + 4;
+    const label = days[i].slice(5).replace('-', '/');
+    return `
+      <div class="bar-col">
+        ${v > 0 ? `<div class="bar-val">${v}</div>` : ''}
+        <div class="bar" style="height:${h}px" title="${days[i]}: ${v} connects"></div>
+        <div class="bar-label">${label}</div>
+      </div>`;
+  }).join('');
+}
+
+// ═══════════════════════════════════════
+//  RENDER TABLE
+// ═══════════════════════════════════════
+function timeAgo(ts) {
+  const diff = (Date.now() - new Date(ts)) / 1000;
+  if (diff < 60)  return 'just now';
+  if (diff < 3600)  return `${Math.floor(diff/60)}m ago`;
+  if (diff < 86400) return `${Math.floor(diff/3600)}h ago`;
+  return `${Math.floor(diff/86400)}d ago`;
+}
+function reasonClass(r) {
+  if (r.includes('Document')) return 'doc';
+  if (r.includes('Hi'))       return 'hi';
+  if (r.includes('Test'))     return 'test';
+  return 'other';
+}
+function renderTable() {
+  const tbody = document.getElementById('tableBody');
+  const empty = document.getElementById('emptyState');
+  const bulkBtn = document.getElementById('bulkDelBtn');
+
+  let list = contacts;
+  if (searchQuery) {
+    const q = searchQuery.toLowerCase();
+    list = list.filter(c => c.name.toLowerCase().includes(q) || c.phone.includes(q));
+  }
+
+  if (!list.length) {
+    tbody.innerHTML = '';
+    empty.style.display = contacts.length ? 'block' : 'block';
+    empty.querySelector('p').innerHTML = contacts.length && searchQuery
+      ? `No contacts match "<strong>${esc(searchQuery)}</strong>"`
+      : 'No contacts saved yet.<br>Connect someone to see them here.';
+  } else {
+    empty.style.display = 'none';
+    tbody.innerHTML = list.map(c => {
+      const link = `https://wa.me/${CC}${c.phone}`;
+      const rc   = reasonClass(c.reason);
+      const chk  = selectedIds.has(c.id);
+      return `
+        <tr>
+          <td><input type="checkbox" class="row-check" data-id="${c.id}" ${chk ? 'checked' : ''} /></td>
+          <td>
+            <div class="contact-name">${esc(c.name)}</div>
+            <div class="contact-phone">+${CC} ${esc(c.phone)}</div>
+          </td>
+          <td><span class="reason-badge ${rc}">${esc(c.reason || 'Other')}</span></td>
+          <td><span class="time-ago" title="${c.timestamp}">${timeAgo(c.timestamp)}</span></td>
+          <td><a href="${link}" target="_blank" rel="noopener noreferrer" class="action-link">💬 Open</a></td>
+          <td><button class="del-btn" onclick="deleteContact('${c.id}')">✕</button></td>
+        </tr>`;
+    }).join('');
+    // re-bind checkboxes
+    tbody.querySelectorAll('.row-check').forEach(cb => {
+      cb.addEventListener('change', () => {
+        cb.checked ? selectedIds.add(cb.dataset.id) : selectedIds.delete(cb.dataset.id);
+        updateBulkUI();
+      });
+    });
+  }
+  bulkBtn.style.display = selectedIds.size ? 'block' : 'none';
+}
+function updateBulkUI() {
+  document.getElementById('bulkDelBtn').style.display = selectedIds.size ? 'block' : 'none';
+}
+document.getElementById('selectAll').addEventListener('change', function() {
+  document.querySelectorAll('.row-check').forEach(cb => {
+    cb.checked = this.checked;
+    this.checked ? selectedIds.add(cb.dataset.id) : selectedIds.delete(cb.dataset.id);
+  });
+  updateBulkUI();
+});
+
+// ═══════════════════════════════════════
+//  SEARCH
+// ═══════════════════════════════════════
+document.getElementById('searchInput').addEventListener('input', function() {
+  searchQuery = this.value.trim();
+  renderTable();
+});
+
+// ═══════════════════════════════════════
+//  HELPERS
+// ═══════════════════════════════════════
+function clean(s) { return s.replace(/\D/g, '').replace(/^0+/, ''); }
+function esc(s) {
+  return String(s).replace(/[&<>"']/g, m => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#039;'}[m]));
+}
+function waLink(phone) { return `https://wa.me/${CC}${phone}`; }
+
+// ═══════════════════════════════════════
+//  MAIN ACTION
+// ═══════════════════════════════════════
+function openAndSave() {
+  const nameEl  = document.getElementById('name');
+  const phoneEl = document.getElementById('phone');
+  const nameErr = document.getElementById('nameError');
+  const phoneErr= document.getElementById('phoneError');
+  const prev    = document.getElementById('linkPreview');
+  const anchor  = document.getElementById('linkAnchor');
+  const reason  = document.getElementById('reason').value;
+
+  nameErr.style.display = phoneErr.style.display = 'none';
+  prev.style.display = 'none';
+
+  const name  = nameEl.value.trim();
+  const phone = clean(phoneEl.value.trim());
+
+  if (!name) {
+    nameErr.textContent = 'Please enter a name.';
+    nameErr.style.display = 'block';
+    nameEl.focus(); return;
+  }
+  if (!phone || phone.length < 7) {
+    phoneErr.textContent = 'Enter a valid phone number.';
+    phoneErr.style.display = 'block';
+    phoneEl.focus(); return;
+  }
+
+  const link = waLink(phone);
+  anchor.href = link; anchor.textContent = link;
+  prev.style.display = 'block';
+  window.open(link, '_blank');
+
+  addContact(name, phoneEl.value, reason);
+  logUsage();
+  showToast(`Contact saved: ${name}`, 'success');
+  nameEl.value = ''; phoneEl.value = '';
+  nameEl.focus();
+}
+
+// ═══════════════════════════════════════
+//  EXPORT CSV
+// ═══════════════════════════════════════
+function exportCSV() {
+  if (!contacts.length) { showToast('No contacts to export', 'error'); return; }
+  const rows = [
+    ['Name','Phone','Reason','WhatsApp Link','Timestamp'],
+    ...contacts.map(c => [c.name, c.phone, c.reason, waLink(c.phone), c.timestamp])
+  ];
+  const csv = rows.map(r => r.map(v => `"${v}"`).join(',')).join('\n');
+  const url = URL.createObjectURL(new Blob([csv], {type:'text/csv;charset=utf-8;'}));
+  const a = document.createElement('a');
+  a.href = url; a.download = `wa_contacts_${new Date().toISOString().split('T')[0]}.csv`;
+  document.body.appendChild(a); a.click(); document.body.removeChild(a);
+  URL.revokeObjectURL(url);
+  showToast(`Exported ${contacts.length} contacts`, 'success');
+}
+
+// ═══════════════════════════════════════
+//  INIT
+// ═══════════════════════════════════════
+window.addEventListener('DOMContentLoaded', () => {
+  loadContacts(); loadUsage();
+  document.getElementById('whatsappBtn').addEventListener('click', openAndSave);
+  document.getElementById('exportBtn').addEventListener('click', exportCSV);
+  document.getElementById('resetBtn').addEventListener('click', resetAnalytics);
+  document.getElementById('bulkDelBtn').addEventListener('click', deleteSelected);
+
+  [document.getElementById('name'), document.getElementById('phone')].forEach(inp => {
+    inp.addEventListener('keydown', e => {
+      if ((e.metaKey || e.ctrlKey) && e.key === 'Enter') { e.preventDefault(); openAndSave(); }
+    });
+  });
+});
+</script>
+</body>
+</html>
